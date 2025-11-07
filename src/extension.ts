@@ -90,8 +90,8 @@ export async function activate(ctx: vscode.ExtensionContext) {
   const TIMER_PRIORITY = 10_000;
   const CSV_PRIORITY   = 9_999;  // just to the right of the timer
 
-  channel = vscode.window.createOutputChannel('TimeIt');
-  channel.appendLine('[TimeIt] activated');
+  channel = vscode.window.createOutputChannel('Clockit');
+  channel.appendLine('[Clockit] activated');
 
   statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, TIMER_PRIORITY);
   statusBar.command = 'clockit.toggle';
@@ -99,8 +99,8 @@ export async function activate(ctx: vscode.ExtensionContext) {
 
   // CSV menu button
   const csvMenuBtn = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, CSV_PRIORITY);
-  csvMenuBtn.text = '$(folder) TimeIt CSV';
-  csvMenuBtn.tooltip = 'TimeIt CSV actions';
+  csvMenuBtn.text = '$(folder) Clockit CSV';
+  csvMenuBtn.tooltip = 'Clockit CSV actions';
   csvMenuBtn.command = 'clockit.csvMenu';
   csvMenuBtn.show();
   ctx.subscriptions.push(csvMenuBtn);

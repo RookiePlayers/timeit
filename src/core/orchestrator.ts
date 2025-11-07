@@ -58,7 +58,7 @@ export class ExportOrchestrator {
         results.push({ kind, ...res });
       } catch (e: any) {
         const msg = e?.message || String(e);
-        console.warn(`TimeIt: sink "${kind}" failed:`, msg);
+        console.warn(`Clockit: sink "${kind}" failed:`, msg);
         results.push({ kind, ok: false, message: msg, error: e });
       }
     }

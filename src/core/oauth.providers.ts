@@ -1,7 +1,7 @@
 import type { OAuthProvider } from './oauth';
 
 // Update with your real publisher & extension IDs
-const REDIRECT = 'vscode://yourpublisher.timeit/oauth/callback';
+const REDIRECT = 'vscode://yourpublisher.clockit/oauth/callback';
 
 export const JiraOAuthProvider: OAuthProvider = {
   id: 'jira',

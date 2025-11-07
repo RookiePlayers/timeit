@@ -125,7 +125,7 @@ describe('JiraSink', () => {
         const [, init] = fetch.mock.calls[0];
         const body = JSON.parse(String(init?.body));
         const textNode = body.comment?.content?.[0]?.content?.[0];
-        expect(textNode?.text).toBe('Logged by TimeIt');
+        expect(textNode?.text).toBe('Logged by Clockit');
     });
     test('uses comment-derived issue key when no git info present', async () => {
         const fetch = mockFetchOk();

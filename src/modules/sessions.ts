@@ -23,7 +23,7 @@ export function registerSessionCommands(ctx: vscode.ExtensionContext, utils: Uti
 async function startSession(utils: Utils) {
   if (utils.isRunning()) {return;}
   utils.beginSession();
-  utils.notify('TimeIt started.');
+  utils.notify('Clockit started.');
 }
 
 async function stopSession(utils: Utils) {

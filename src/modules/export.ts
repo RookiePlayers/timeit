@@ -8,7 +8,7 @@ import { globalSecretStore } from '../core/secret-store';
 import { ExportOrchestrator } from '../core/orchestrator';
 import type { Session } from '../core/types';
 import { Utils } from '../utils';
-import { TimeItCacheProvider } from '../core/cache/index.cache';
+import { ClockitCacheProvider } from '../core/cache/index.cache';
 
 export function registerExportCommands(ctx: vscode.ExtensionContext, utils: Utils) {
   ctx.subscriptions.push(
@@ -64,7 +64,7 @@ async function exportViaOrchestrator(ctx: vscode.ExtensionContext, utils: Utils,
   ];
 
   const sinks = registry.create(sinkConfigs);
-    const cacheProvider = new TimeItCacheProvider(ctx); // memory + globalState
+    const cacheProvider = new ClockitCacheProvider(ctx); // memory + globalState
 
   const orchestrator = new ExportOrchestrator(sinks, new PromptService(globalSecretStore(ctx), cacheProvider.memoryOnly()));
   const results = await orchestrator.hydrateAndExport(session);
@@ -81,7 +81,7 @@ export async function chooseSinksCommand() {
   );
   if (!picks) {return;}
   await vscode.workspace.getConfiguration().update('clockit.enabledSinks', picks, vscode.ConfigurationTarget.Workspace);
-  vscode.window.showInformationMessage(`TimeIt sinks set to: ${picks.join(', ')}`);
+  vscode.window.showInformationMessage(`Clockit sinks set to: ${picks.join(', ')}`);
 }
 
 async function promptForSinks(current?: string[]) {

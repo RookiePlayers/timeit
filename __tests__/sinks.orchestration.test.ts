@@ -22,7 +22,7 @@ class FakePromptService {
   async resolveField(spec: FieldSpec): Promise<unknown> {
     // 1) Try existing persisted value first
     if (spec.type === 'secret') {
-      const k = spec.secretKey || `timeit.${spec.key}`;
+      const k = spec.secretKey || `clockit.${spec.key}`;
       if (this.has(k) && this.exists(this.store[k])) return this.store[k];
     } else if (spec.settingKey) {
       const k = spec.settingKey;
@@ -38,7 +38,7 @@ class FakePromptService {
 
     // 3) "Persist" where spec says to store
     if (spec.type === 'secret') {
-      const k = spec.secretKey || `timeit.${spec.key}`;
+      const k = spec.secretKey || `clockit.${spec.key}`;
       this.store[k] = v;
     } else if (spec.settingKey) {
       this.store[spec.settingKey] = v;
@@ -91,7 +91,7 @@ describe('ExportOrchestrator', () => {
         type: 'string',
         scope: 'setup',
         required: true,
-        settingKey: 'timeit.svc.domain',
+        settingKey: 'clockit.svc.domain',
       },
       {
         key: 'svc.token',
@@ -99,7 +99,7 @@ describe('ExportOrchestrator', () => {
         type: 'secret',
         scope: 'setup',
         required: true,
-        secretKey: 'timeit.svc.token',
+        secretKey: 'clockit.svc.token',
       },
       {
         key: 'issueKey',
@@ -127,8 +127,8 @@ describe('ExportOrchestrator', () => {
     expect(results[0].ok).toBe(true);
 
     // persisted
-    expect(prompts.store['timeit.svc.domain']).toBe('team.example.com');
-    expect(prompts.store['timeit.svc.token']).toBe('SECRET123');
+    expect(prompts.store['clockit.svc.domain']).toBe('team.example.com');
+    expect(prompts.store['clockit.svc.token']).toBe('SECRET123');
 
     // injected into sink.options
     // @ts-ignore
@@ -145,7 +145,7 @@ describe('ExportOrchestrator', () => {
         type: 'string',
         scope: 'setup',
         required: true,
-        settingKey: 'timeit.need.this',
+        settingKey: 'clockit.need.this',
       },
     ];
     const sink = makeSink('needs', reqs);
@@ -173,7 +173,7 @@ describe('ExportOrchestrator', () => {
         type: 'string',
         scope: 'setup',
         required: true,
-        settingKey: 'timeit.must.have',
+        settingKey: 'clockit.must.have',
       },
     ];
     const badSink = makeSink('bad', badReqs);

@@ -20,7 +20,7 @@ export class SinkRegistry {
 
       const factory = this.factories.get(c.kind);
       if (!factory) {
-        console.warn(`TimeIt: no factory for kind=${c.kind}, skipping`);
+        console.warn(`Clockit: no factory for kind=${c.kind}, skipping`);
         continue;
       }
 
@@ -28,7 +28,7 @@ export class SinkRegistry {
         const sink = factory(c);
         out.push(sink);
       } catch (e) {
-        console.warn(`TimeIt: failed to construct sink kind=${c.kind}:`, e);
+        console.warn(`Clockit: failed to construct sink kind=${c.kind}:`, e);
       }
     }
     return out;

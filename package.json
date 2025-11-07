@@ -6,8 +6,8 @@
   "publisher": "octech",
   "icon": "icon.png",
   "license": "MIT",
-  "repository": "https://github.com/RookiePlayers/timeit.git",
-  "homepage": "https://github.com/RookiePlayers/timeit.git",
+  "repository": "https://github.com/RookiePlayers/clockit.git",
+  "homepage": "https://github.com/RookiePlayers/clockit.git",
   "engines": {
     "vscode": "^1.105.0"
   },
@@ -22,55 +22,55 @@
     "commands": [
       {
         "command": "clockit.startTimeTracking",
-        "title": "TimeIt: Start Time Tracking"
+        "title": "Clockit: Start Time Tracking"
       },
       {
         "command": "clockit.stopTimeTracking",
-        "title": "TimeIt: Stop Time Tracking"
+        "title": "Clockit: Stop Time Tracking"
       },
       {
         "command": "clockit.showTimeLog",
-        "title": "TimeIt: Show Time Log"
+        "title": "Clockit: Show Time Log"
       },
       {
         "command": "clockit.clearTimeLog",
-        "title": "TimeIt: Clear Time Log"
+        "title": "Clockit: Clear Time Log"
       },
       {
         "command": "clockit.toggle",
-        "title": "TimeIt: Toggle Time Tracking"
+        "title": "Clockit: Toggle Time Tracking"
       },
       {
         "command": "clockit.openCsv",
-        "title": "TimeIt: Open CSV Log"
+        "title": "Clockit: Open CSV Log"
       },
       {
         "command": "clockit.chooseCsvFolder",
-        "title": "TimeIt: Choose CSV Output Folder"
+        "title": "Clockit: Choose CSV Output Folder"
       },
       {
         "command": "clockit.chooseSinks",
-        "title": "TimeIt: Choose Sinks"
+        "title": "Clockit: Choose Sinks"
       },
       {
         "command": "clockit.editCredentials",
-        "title": "TimeIt: Edit Credentials"
+        "title": "Clockit: Edit Credentials"
       },
       {
         "command": "clockit.clearCredentials",
-        "title": "TimeIt: Clear Credentials"
+        "title": "Clockit: Clear Credentials"
       },
       {
         "command": "clockit.signIn.jira",
-        "title": "TimeIt: Sign in to Jira (Coming Soon)"
+        "title": "Clockit: Sign in to Jira (Coming Soon)"
       },
       {
         "command": "clockit.signIn.notion",
-        "title": "TimeIt: Sign in to Notion (Coming Soon)"
+        "title": "Clockit: Sign in to Notion (Coming Soon)"
       }
     ],
     "configuration": {
-      "title": "TimeIt Settings",
+      "title": "Clockit Settings",
       "properties": {
         "clockit.enabledSinks": {
           "type": "array",

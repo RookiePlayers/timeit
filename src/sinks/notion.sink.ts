@@ -208,7 +208,7 @@ export class NotionSink extends BaseSink implements TimeSink {
 
     const parts = [
       s.issueKey ? `[${s.issueKey}] ` : '',
-      s.comment?.trim() || 'Logged by TimeIt',
+      s.comment?.trim() || 'Logged by Clockit',
       ` • ${Math.round((s.durationSeconds ?? 0) / 60)}m`,
       s.branch ? ` • ${s.branch}` : '',
     ].filter(Boolean).join('');

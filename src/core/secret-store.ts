@@ -25,7 +25,7 @@ export class SecretStore {
    * so we simulate this by storing an internal key registry.
    */
   async keys(): Promise<string[]> {
-    const registryKey = '__timeit_secret_keys__';
+    const registryKey = '__clockit_secret_keys__';
     const raw = await this.secrets.get(registryKey);
     if (!raw) {return [];}
     try {
@@ -39,7 +39,7 @@ export class SecretStore {
    * ⚡ Added: ensure registry is updated whenever a key changes.
    */
   private async updateRegistry(key: string, remove = false) {
-    const registryKey = '__timeit_secret_keys__';
+    const registryKey = '__clockit_secret_keys__';
     const existing = new Set(await this.keys());
     if (remove) {existing.delete(key);}
     else {existing.add(key);}
@@ -62,7 +62,7 @@ export class SecretStore {
     await this.remove(key);
   }
 
-  /** Clear all TimeIt-related secrets */
+  /** Clear all Clockit-related secrets */
   async clearAll() {
     const all = await this.keys();
     for (const key of all.filter(k => k.startsWith('clockit.'))) {

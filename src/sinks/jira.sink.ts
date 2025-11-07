@@ -231,7 +231,7 @@ export class JiraSink extends BaseSink implements TimeSink {
         version: 1,
         type: 'doc',
         content: [
-          { type: 'paragraph', content: [{ type: 'text', text: s.comment?.trim() || 'Logged by TimeIt' }] },
+          { type: 'paragraph', content: [{ type: 'text', text: s.comment?.trim() || 'Logged by Clockit' }] },
         ],
       },
     };

@@ -1,10 +1,10 @@
-# ⏱️ TimeIt – Developer-Friendly Time Tracker for VS Code
+# ⏱️ Clockit – Developer-Friendly Time Tracker for VS Code
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://marketplace.visualstudio.com/items?itemName=octech.timeit)
-[![Build](https://github.com/OverlyCreativeTech/timeit/actions/workflows/ci.yml/badge.svg)](https://github.com/OverlyCreativeTech/timeit/actions)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://marketplace.visualstudio.com/items?itemName=octech.clockit)
+[![Build](https://github.com/OverlyCreativeTech/clockit/actions/workflows/ci.yml/badge.svg)](https://github.com/OverlyCreativeTech/clockit/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-**TimeIt** helps developers log coding sessions automatically, add session comments, and export tracked time to **CSV**, **Jira**, or **Notion** — all within VS Code.
+**Clockit** helps developers log coding sessions automatically, add session comments, and export tracked time to **CSV**, **Jira**, or **Notion** — all within VS Code.
 
 ---
 <img width="1507" height="543" alt="Screenshot 2025-11-07 at 07 23 28" src="https://github.com/user-attachments/assets/1d259853-6291-4f15-9331-037adfbae9f2" />
@@ -32,7 +32,7 @@ https://github.com/user-attachments/assets/cfe60e7e-d0d2-4ba1-b17e-f685a0d48370
 
    ```bash
    git clone https://github.com/OverlyCreativeTech/clockit.git
-   cd timeit
+   cd clockit
    ```
 
 2. Install dependencies:
@@ -58,7 +58,7 @@ https://github.com/user-attachments/assets/cfe60e7e-d0d2-4ba1-b17e-f685a0d48370
 - Click the **⏱️ timer** in the status bar or run:
 
   ```
-  TimeIt: Start Tracking
+  Clockit: Start Tracking
   ```
 
 ### Stop tracking
@@ -66,7 +66,7 @@ https://github.com/user-attachments/assets/cfe60e7e-d0d2-4ba1-b17e-f685a0d48370
 - Click the timer again or run:
 
   ```
-  TimeIt: Stop Tracking
+  Clockit: Stop Tracking
   ```
 
 - Add a session comment when prompted.
@@ -90,7 +90,7 @@ Click the **📂 CSV** icon next to the timer to:
 
 ### First-time setup
 
-When a sink (like Jira) is selected, TimeIt prompts you for:
+When a sink (like Jira) is selected, Clockit prompts you for:
 
 - Domain (e.g., `yourteam.atlassian.net`)
 - Email
@@ -105,8 +105,8 @@ Values are stored securely using:
 
 | Command | Description |
 |----------|-------------|
-| `TimeIt: Edit Credentials` | Edit existing sink credentials. |
-| `TimeIt: Clear Credentials` | Remove credentials for a specific sink or all. |
+| `Clockit: Edit Credentials` | Edit existing sink credentials. |
+| `Clockit: Clear Credentials` | Remove credentials for a specific sink or all. |
 
 ---
 

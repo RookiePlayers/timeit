@@ -15,7 +15,7 @@ function todayCsvName(prefix = 'backup_') {
 let dirA: string;
 
 describe('BackupManager', () => {
-  const suiteRoot = path.join(os.tmpdir(), `timeit-backup-tests-${Date.now()}`);
+  const suiteRoot = path.join(os.tmpdir(), `clockit-backup-tests-${Date.now()}`);
 
   beforeAll(async () => {
     await fs.mkdir(suiteRoot, { recursive: true });
@@ -38,7 +38,7 @@ beforeEach(async () => {
   jest.spyOn(global, 'clearInterval');
 
   // fresh unique dir per test run
-  dirA = path.join(os.tmpdir(), `timeit-backup-tests_${Date.now()}${Math.random()}`, 'A');
+  dirA = path.join(os.tmpdir(), `clockit-backup-tests_${Date.now()}${Math.random()}`, 'A');
   await fs.mkdir(dirA, { recursive: true });
 });
 

@@ -4,13 +4,13 @@ import { InMemorySuggestionCache } from './cache.memory';
 import { GlobalStateCache } from './cache.global';
 import { CompositeCache } from './cache.composite';
 
-export class TimeItCacheProvider implements CacheProvider {
+export class ClockitCacheProvider implements CacheProvider {
   private readonly memory = new InMemorySuggestionCache();
   private readonly persistent: Cache;
   private readonly composite: Cache;
 
   constructor(ctx: vscode.ExtensionContext) {
-    this.persistent = new GlobalStateCache(ctx, 'timeit');
+    this.persistent = new GlobalStateCache(ctx, 'clockit');
     this.composite = new CompositeCache([this.memory, this.persistent]);
   }
 

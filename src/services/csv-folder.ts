@@ -16,7 +16,7 @@ export class CsvFolderService {
       { label: '$(replace) Change CSV folder', id: 'changeFolder' },
       { label: '$(history) Browse past logs…', id: 'browsePast' },
     ],
-    { placeHolder: 'TimeIt — CSV actions', ignoreFocusOut: true }
+    { placeHolder: 'Clockit — CSV actions', ignoreFocusOut: true }
   );
   if (!pick) {return;}
 
@@ -45,7 +45,7 @@ async getCsvRootAndFile() {
   const root =
     outDir ||
     this.vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ||
-    path.join(os.homedir(), '.timeit');
+    path.join(os.homedir(), '.clockit');
   const full = path.join(root, filename);
   return { root, full };
 }
@@ -113,7 +113,7 @@ async  chooseCsvFolder() {
     canSelectFiles: false,
     canSelectFolders: true,
     canSelectMany: false,
-    openLabel: 'Use this folder for TimeIt CSV',
+    openLabel: 'Use this folder for Clockit CSV',
     defaultUri: this.vscode.workspace.workspaceFolders?.[0]?.uri,
   });
   if (!selection || selection.length === 0) {return;}
@@ -127,6 +127,6 @@ async  chooseCsvFolder() {
     const fs = await import('fs/promises');
     await fs.mkdir(folderUri.fsPath, { recursive: true }).catch(() => {});
   }
-  this.vscode.window.showInformationMessage(`TimeIt CSV folder set to: ${folderUri.fsPath}`);
+  this.vscode.window.showInformationMessage(`Clockit CSV folder set to: ${folderUri.fsPath}`);
 }
 }

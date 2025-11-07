@@ -21,7 +21,7 @@ export class CsvSink extends BaseSink {
 
   const dir = this.expand(String(this.options.outputDirectory || '')) ||
     process.env.WORKSPACE_ROOT ||
-    path.join(os.homedir(), '.timeit');
+    path.join(os.homedir(), '.clockit');
 
   const file = String(this.options.filename || 'time_log.csv');
   const addHeader = Boolean(this.options.addHeaderIfMissing ?? true);
