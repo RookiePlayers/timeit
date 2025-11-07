@@ -12,3 +12,4 @@ jest.config.js
 .env
 .env
 commitlint.config.js
+jest.config.js
