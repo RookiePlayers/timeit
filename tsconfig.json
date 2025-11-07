@@ -15,6 +15,7 @@
     "node_modules",
     "out",
     "dist",
+    "*.config.ts",
     ".vscode-test",
     "__tests__",
     "__test__"
