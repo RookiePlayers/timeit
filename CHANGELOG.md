@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/RookiePlayers/timeit/compare/v1.1.0...v1.1.1) (2025-11-07)
+
+
+### Bug Fixes
+
+* Update repository and homepage URLs in package.json to reflect correct project location ([056e7eb](https://github.com/RookiePlayers/timeit/commit/056e7eb659543b2455a4b828619faf5f6b8486a6))
+
 # [1.1.0](https://github.com/RookiePlayers/timeit/compare/v1.0.0...v1.1.0) (2025-11-07)
 
 
