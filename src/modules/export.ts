@@ -12,16 +12,16 @@ import { TimeItCacheProvider } from '../core/cache/index.cache';
 
 export function registerExportCommands(ctx: vscode.ExtensionContext, utils: Utils) {
   ctx.subscriptions.push(
-    vscode.commands.registerCommand('timeit_logger.chooseSinks', chooseSinksCommand),
+    vscode.commands.registerCommand('clockit.chooseSinks', chooseSinksCommand),
     // internal command called by session module
-    vscode.commands.registerCommand('timeit_logger._exportSession', (session: Session) => exportViaOrchestrator(ctx, utils, session)),
+    vscode.commands.registerCommand('clockit._exportSession', (session: Session) => exportViaOrchestrator(ctx, utils, session)),
   );
 }
 
 async function exportViaOrchestrator(ctx: vscode.ExtensionContext, utils: Utils, session: Session) {
   const cfg = vscode.workspace.getConfiguration();
-  const enabledSinksSetting = cfg.get<string[]>('timeit_logger.enabledSinks');
-  const askEveryTime = cfg.get<boolean>('timeit_logger.askSinksEachTime') ?? true;
+  const enabledSinksSetting = cfg.get<string[]>('clockit.enabledSinks');
+  const askEveryTime = cfg.get<boolean>('clockit.askSinksEachTime') ?? true;
 
   // Always prompt before export
   const sinksToUse = await promptForSinks(enabledSinksSetting);
@@ -30,7 +30,7 @@ async function exportViaOrchestrator(ctx: vscode.ExtensionContext, utils: Utils,
     return;
   }
   if (!askEveryTime) {
-    await cfg.update('timeit_logger.enabledSinks', sinksToUse, vscode.ConfigurationTarget.Workspace);
+    await cfg.update('clockit.enabledSinks', sinksToUse, vscode.ConfigurationTarget.Workspace);
   }
 
   const registry = new SinkRegistry();
@@ -43,10 +43,10 @@ async function exportViaOrchestrator(ctx: vscode.ExtensionContext, utils: Utils,
       kind: 'csv',
       enabled: sinksToUse.includes('csv'),
       options: {
-        outputDirectory: cfg.get('timeit_logger.csv.outputDirectory'),
-        filename: cfg.get('timeit_logger.csv.filename'),
-        addHeaderIfMissing: cfg.get('timeit_logger.csv.addHeaderIfMissing'),
-        ensureDirectory: cfg.get('timeit_logger.csv.ensureDirectory'),
+        outputDirectory: cfg.get('clockit.csv.outputDirectory'),
+        filename: cfg.get('clockit.csv.filename'),
+        addHeaderIfMissing: cfg.get('clockit.csv.addHeaderIfMissing'),
+        ensureDirectory: cfg.get('clockit.csv.ensureDirectory'),
       },
     },
     {
@@ -77,10 +77,10 @@ async function exportViaOrchestrator(ctx: vscode.ExtensionContext, utils: Utils,
 
 export async function chooseSinksCommand() {
   const picks = await promptForSinks(
-    vscode.workspace.getConfiguration().get<string[]>('timeit_logger.enabledSinks') ?? ['csv']
+    vscode.workspace.getConfiguration().get<string[]>('clockit.enabledSinks') ?? ['csv']
   );
   if (!picks) {return;}
-  await vscode.workspace.getConfiguration().update('timeit_logger.enabledSinks', picks, vscode.ConfigurationTarget.Workspace);
+  await vscode.workspace.getConfiguration().update('clockit.enabledSinks', picks, vscode.ConfigurationTarget.Workspace);
   vscode.window.showInformationMessage(`TimeIt sinks set to: ${picks.join(', ')}`);
 }
 

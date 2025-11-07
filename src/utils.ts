@@ -71,7 +71,7 @@ export class Utils {
 
   // ── timers / status
   private startTimers() {
-    const idleMinutes = this.vscode.workspace.getConfiguration().get<number>('timeit_logger.idleTimeoutMinutes') ?? 5;
+    const idleMinutes = this.vscode.workspace.getConfiguration().get<number>('clockit.idleTimeoutMinutes') ?? 5;
 
     this.tickTimer = setInterval(() => {
       if (!this.running) {return;}
@@ -114,7 +114,7 @@ export class Utils {
 
   // ── notifications
   notify(msg: string, type: 'info' | 'warn' | 'error' = 'info') {
-    const show = this.vscode.workspace.getConfiguration().get<boolean>('timeit_logger.showNotifications') ?? true;
+    const show = this.vscode.workspace.getConfiguration().get<boolean>('clockit.showNotifications') ?? true;
     if (!show) {return;}
     if (type === 'info') {this.vscode.window.showInformationMessage(msg);}
     else if (type === 'warn') {this.vscode.window.showWarningMessage(msg);}
@@ -124,8 +124,8 @@ export class Utils {
   // ── CSV helpers
   async openCsvLog() {
     const cfg = this.vscode.workspace.getConfiguration();
-    const outDir = (cfg.get<string>('timeit_logger.csv.outputDirectory') || '').trim();
-    const filename = cfg.get<string>('timeit_logger.csv.filename') || 'time_log.csv';
+    const outDir = (cfg.get<string>('clockit.csv.outputDirectory') || '').trim();
+    const filename = cfg.get<string>('clockit.csv.filename') || 'time_log.csv';
 
     const path = await import('path');
     const os = await import('os');
@@ -158,9 +158,9 @@ export class Utils {
 
     const folderUri = selection[0];
     const cfg = this.vscode.workspace.getConfiguration();
-    await cfg.update('timeit_logger.csv.outputDirectory', folderUri.fsPath, this.vscode.ConfigurationTarget.Workspace);
+    await cfg.update('clockit.csv.outputDirectory', folderUri.fsPath, this.vscode.ConfigurationTarget.Workspace);
 
-    const ensure = cfg.get<boolean>('timeit_logger.csv.ensureDirectory') ?? true;
+    const ensure = cfg.get<boolean>('clockit.csv.ensureDirectory') ?? true;
     if (ensure) {
       const fs = await import('fs/promises');
       await fs.mkdir(folderUri.fsPath, { recursive: true }).catch(() => {});

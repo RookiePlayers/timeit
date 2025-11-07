@@ -22,7 +22,7 @@ class FakePromptService {
     async resolveField(spec) {
         // 1) Try existing persisted value first
         if (spec.type === 'secret') {
-            const k = spec.secretKey || `timeit_logger.${spec.key}`;
+            const k = spec.secretKey || `clockit.${spec.key}`;
             if (this.has(k) && this.exists(this.store[k]))
                 return this.store[k];
         }
@@ -39,7 +39,7 @@ class FakePromptService {
         }
         // 3) "Persist" where spec says to store
         if (spec.type === 'secret') {
-            const k = spec.secretKey || `timeit_logger.${spec.key}`;
+            const k = spec.secretKey || `clockit.${spec.key}`;
             this.store[k] = v;
         }
         else if (spec.settingKey) {
@@ -90,7 +90,7 @@ describe('ExportOrchestrator', () => {
                 type: 'string',
                 scope: 'setup',
                 required: true,
-                settingKey: 'timeit_logger.svc.domain',
+                settingKey: 'clockit.svc.domain',
             },
             {
                 key: 'svc.token',
@@ -98,7 +98,7 @@ describe('ExportOrchestrator', () => {
                 type: 'secret',
                 scope: 'setup',
                 required: true,
-                secretKey: 'timeit_logger.svc.token',
+                secretKey: 'clockit.svc.token',
             },
             {
                 key: 'issueKey',
@@ -123,8 +123,8 @@ describe('ExportOrchestrator', () => {
         });
         expect(results[0].ok).toBe(true);
         // persisted
-        expect(prompts.store['timeit_logger.svc.domain']).toBe('team.example.com');
-        expect(prompts.store['timeit_logger.svc.token']).toBe('SECRET123');
+        expect(prompts.store['clockit.svc.domain']).toBe('team.example.com');
+        expect(prompts.store['clockit.svc.token']).toBe('SECRET123');
         // injected into sink.options
         // @ts-ignore
         expect(sink.options['svc.domain']).toBe('team.example.com');
@@ -139,7 +139,7 @@ describe('ExportOrchestrator', () => {
                 type: 'string',
                 scope: 'setup',
                 required: true,
-                settingKey: 'timeit_logger.need.this',
+                settingKey: 'clockit.need.this',
             },
         ];
         const sink = makeSink('needs', reqs);
@@ -164,7 +164,7 @@ describe('ExportOrchestrator', () => {
                 type: 'string',
                 scope: 'setup',
                 required: true,
-                settingKey: 'timeit_logger.must.have',
+                settingKey: 'clockit.must.have',
             },
         ];
         const badSink = makeSink('bad', badReqs);

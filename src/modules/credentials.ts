@@ -8,8 +8,8 @@ import { globalSecretStore } from '../core/secret-store';
 
 export function registerCredentialCommands(ctx: vscode.ExtensionContext) {
   ctx.subscriptions.push(
-    vscode.commands.registerCommand('timeit_logger.editCredentials',  editCredentialsCommand.bind(null, ctx)),
-    vscode.commands.registerCommand('timeit_logger.clearCredentials', clearCredentialsCommand.bind(null, ctx)),
+    vscode.commands.registerCommand('clockit.editCredentials',  editCredentialsCommand.bind(null, ctx)),
+    vscode.commands.registerCommand('clockit.clearCredentials', clearCredentialsCommand.bind(null, ctx)),
   );
 }
 
@@ -100,7 +100,7 @@ async function readStoredValue(
   cfg: vscode.WorkspaceConfiguration
 ): Promise<unknown> {
   if (spec.type === 'secret') {
-    const key = spec.secretKey || `timeit_logger.${spec.key}`;
+    const key = spec.secretKey || `clockit.${spec.key}`;
     const v = await secrets.get(key);
     if (exists(v)) {return v;}
   }
@@ -119,7 +119,7 @@ async function persistValue(
   cfg: vscode.WorkspaceConfiguration
 ) {
   if (spec.type === 'secret') {
-    const key = spec.secretKey || `timeit_logger.${spec.key}`;
+    const key = spec.secretKey || `clockit.${spec.key}`;
     await secrets.set(key, String(value ?? ''));
     return;
   }
@@ -133,7 +133,7 @@ async function deleteValue(
   cfg: vscode.WorkspaceConfiguration
 ) {
   if (spec.type === 'secret') {
-    const key = spec.secretKey || `timeit_logger.${spec.key}`;
+    const key = spec.secretKey || `clockit.${spec.key}`;
     await secrets.delete(key).catch(() => {});
     return;
   }
@@ -143,14 +143,14 @@ async function deleteValue(
 
 async function clearAllSecrets(secrets: { keys(): Promise<string[]>; delete(k: string): Promise<void> }) {
   const all = await secrets.keys();
-  await Promise.all(all.filter(k => k.startsWith('timeit_logger.')).map(k => secrets.delete(k).catch(()=>{})));
+  await Promise.all(all.filter(k => k.startsWith('clockit.')).map(k => secrets.delete(k).catch(()=>{})));
 }
 
 async function clearKnownSettings(cfg: vscode.WorkspaceConfiguration) {
   const keys = [
-    'timeit_logger.jira.domain', 'timeit_logger.jira.email',
-    'timeit_logger.notion.databaseId', 'timeit_logger.notion.pageId',
-    'timeit_logger.enabledSinks'
+    'clockit.jira.domain', 'clockit.jira.email',
+    'clockit.notion.databaseId', 'clockit.notion.pageId',
+    'clockit.enabledSinks'
   ];
   await Promise.all(keys.map(k => cfg.update(k, undefined, vscode.ConfigurationTarget.Workspace)));
 }

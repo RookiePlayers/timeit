@@ -1,12 +1,12 @@
 {
-  "name": "timeit-logger",
-  "displayName": "TimeIt: Session manager",
+  "name": "clockit",
+  "displayName": "ClockIt: Session manager",
   "description": "A time logger to track your coding sessions.",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "publisher": "octech",
   "license": "MIT",
-  "repository": "https://github.com/RookiePlayers/timeit_logger.git",
-  "homepage": "https://github.com/RookiePlayers/timeit_logger.git",
+  "repository": "https://github.com/RookiePlayers/timeit.git",
+  "homepage": "https://github.com/RookiePlayers/timeit.git",
   "engines": {
     "vscode": "^1.105.0"
   },
@@ -20,58 +20,58 @@
   "contributes": {
     "commands": [
       {
-        "command": "timeit_logger.startTimeTracking",
+        "command": "clockit.startTimeTracking",
         "title": "TimeIt: Start Time Tracking"
       },
       {
-        "command": "timeit_logger.stopTimeTracking",
+        "command": "clockit.stopTimeTracking",
         "title": "TimeIt: Stop Time Tracking"
       },
       {
-        "command": "timeit_logger.showTimeLog",
+        "command": "clockit.showTimeLog",
         "title": "TimeIt: Show Time Log"
       },
       {
-        "command": "timeit_logger.clearTimeLog",
+        "command": "clockit.clearTimeLog",
         "title": "TimeIt: Clear Time Log"
       },
       {
-        "command": "timeit_logger.toggle",
+        "command": "clockit.toggle",
         "title": "TimeIt: Toggle Time Tracking"
       },
       {
-        "command": "timeit_logger.openCsv",
+        "command": "clockit.openCsv",
         "title": "TimeIt: Open CSV Log"
       },
       {
-        "command": "timeit_logger.chooseCsvFolder",
+        "command": "clockit.chooseCsvFolder",
         "title": "TimeIt: Choose CSV Output Folder"
       },
       {
-        "command": "timeit_logger.chooseSinks",
+        "command": "clockit.chooseSinks",
         "title": "TimeIt: Choose Sinks"
       },
       {
-        "command": "timeit_logger.editCredentials",
+        "command": "clockit.editCredentials",
         "title": "TimeIt: Edit Credentials"
       },
       {
-        "command": "timeit_logger.clearCredentials",
+        "command": "clockit.clearCredentials",
         "title": "TimeIt: Clear Credentials"
       },
       {
-        "command": "timeit_logger.signIn.jira",
+        "command": "clockit.signIn.jira",
         "title": "TimeIt: Sign in to Jira (Coming Soon)"
       },
       {
-        "command": "timeit_logger.signIn.notion",
+        "command": "clockit.signIn.notion",
         "title": "TimeIt: Sign in to Notion (Coming Soon)"
       }
     ],
     "configuration": {
       "title": "TimeIt Settings",
       "properties": {
-        "timeit_logger.enabledSinks": {
+        "clockit.enabledSinks": {
           "type": "array",
           "items": {
             "type": "string",
@@ -86,103 +86,103 @@
           ],
           "description": "Select which sinks to use for exporting sessions."
         },
-        "timeit_logger.askSinksEachTime": {
+        "clockit.askSinksEachTime": {
           "type": "boolean",
           "default": true,
           "description": "Always prompt which sinks to use before exporting."
         },
-        "timeit_logger.enableJira": {
+        "clockit.enableJira": {
           "type": "boolean",
           "default": false,
           "description": "Enable Jira integration for time tracking."
         },
-        "timeit_logger.jira.apiToken": {
+        "clockit.jira.apiToken": {
           "type": "string",
           "default": "",
           "description": "Jira API token for authentication."
         },
-        "timeit_logger.jira.email": {
+        "clockit.jira.email": {
           "type": "string",
           "default": "",
           "description": "Email associated with your Jira account."
         },
-        "timeit_logger.jira.domain": {
+        "clockit.jira.domain": {
           "type": "string",
           "default": "",
           "description": "Your Jira domain (e.g., your-domain.atlassian.net)."
         },
-        "timeit_logger.csv.outputDirectory": {
+        "clockit.csv.outputDirectory": {
           "type": "string",
           "default": "",
           "description": "Directory to save CSV time logs. Leave empty to use workspace root."
         },
-        "timeit_logger.csv.filename": {
+        "clockit.csv.filename": {
           "type": "string",
           "default": "time_log.csv",
           "description": "Filename for the CSV time log."
         },
-        "timeit_logger.csv.addHeaderIfMissing": {
+        "clockit.csv.addHeaderIfMissing": {
           "type": "boolean",
           "default": true,
           "description": "Add header row to CSV file if it's missing."
         },
-        "timeit_logger.csv.ensureDirectory": {
+        "clockit.csv.ensureDirectory": {
           "type": "boolean",
           "default": true,
           "description": "Automatically create the output directory if it doesn't exist."
         },
-        "timeit_logger.autoStartOnLaunch": {
+        "clockit.autoStartOnLaunch": {
           "type": "boolean",
           "default": true,
           "description": "Automatically start time tracking when VSCode launches."
         },
-        "timeit_logger.idleTimeoutMinutes": {
+        "clockit.idleTimeoutMinutes": {
           "type": "number",
           "default": 5,
           "description": "Number of idle minutes before pausing time tracking."
         },
-        "timeit_logger.showNotifications": {
+        "clockit.showNotifications": {
           "type": "boolean",
           "default": true,
           "description": "Show notifications for time tracking events."
         },
-        "timeit_logger.notion.enableNotion": {
+        "clockit.notion.enableNotion": {
           "type": "boolean",
           "default": false,
           "description": "Enable Notion integration for time tracking."
         },
-        "timeit_logger.notion.pageId": {
+        "clockit.notion.pageId": {
           "type": "string",
           "default": "",
           "description": "Notion Page ID where time logs will be recorded."
         },
-        "timeit_logger.notion.apiToken": {
+        "clockit.notion.apiToken": {
           "type": "string",
           "default": "",
           "description": "Notion API token for authentication."
         },
-        "timeit_logger.notion.databaseId": {
+        "clockit.notion.databaseId": {
           "type": "string",
           "default": "",
           "description": "Notion Database ID for logging time entries."
         },
-        "timeit_logger.backup.enabled": {
+        "clockit.backup.enabled": {
           "type": "boolean",
           "default": true,
           "description": "Periodically checkpoint the active time session to a backup CSV and flush on shutdown/errors."
         },
-        "timeit_logger.backup.intervalSeconds": {
+        "clockit.backup.intervalSeconds": {
           "type": "number",
           "default": 60,
           "minimum": 10,
           "description": "How often to checkpoint the in-progress session."
         },
-        "timeit_logger.backup.directory": {
+        "clockit.backup.directory": {
           "type": "string",
           "default": "",
           "description": "Directory for backups. If empty, use the CSV sink directory or workspace root."
         },
-        "timeit_logger.backup.filenamePrefix": {
+        "clockit.backup.filenamePrefix": {
           "type": "string",
           "default": "backup_",
           "description": "Prefix for backup CSV files. Final name is prefix + YYYYMMDD + .csv"

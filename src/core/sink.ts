@@ -27,19 +27,19 @@ export interface FieldSpec {
    */
   validate?: (value: unknown) => string | undefined;
 
-  /** Where to store/read non-secret values in VS Code settings (optional but recommended), e.g. 'timeit_logger.jira.domain' */
+  /** Where to store/read non-secret values in VS Code settings (optional but recommended), e.g. 'clockit.jira.domain' */
   settingKey?: string;
 
   /**
    * Where to store/read secret values in SecretStorage.
-   * Default: 'timeit_logger.<key>' (e.g. 'timeit_logger.jira.apiToken')
+   * Default: 'clockit.<key>' (e.g. 'clockit.jira.apiToken')
    */
   secretKey?: string;
 
   /**
    * Persistence behavior:
    * - 'settings' (default for non-secrets): save to workspace settings via `settingKey` or `key`
-   * - 'secret'   (default for secrets): save to SecretStorage via `secretKey` or 'timeit_logger.<key>'
+   * - 'secret'   (default for secrets): save to SecretStorage via `secretKey` or 'clockit.<key>'
    * - 'memory'   : do not persist; only use for this run
    */
   persist?: 'settings' | 'secret' | 'memory';

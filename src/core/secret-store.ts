@@ -65,7 +65,7 @@ export class SecretStore {
   /** Clear all TimeIt-related secrets */
   async clearAll() {
     const all = await this.keys();
-    for (const key of all.filter(k => k.startsWith('timeit_logger.'))) {
+    for (const key of all.filter(k => k.startsWith('clockit.'))) {
       await this.remove(key);
     }
   }

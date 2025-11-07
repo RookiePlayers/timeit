@@ -34,7 +34,7 @@ export class JiraSink extends BaseSink implements TimeSink {
         placeholder: 'your-team.atlassian.net',
         description: 'Your Jira Cloud hostname (no protocol).',
         validate: v => /atlassian\.net$/i.test(String(v ?? '').trim()) ? undefined : 'Must end with atlassian.net',
-        settingKey: 'timeit_logger.jira.domain',
+        settingKey: 'clockit.jira.domain',
       },
       {
         key: 'jira.email',
@@ -43,7 +43,7 @@ export class JiraSink extends BaseSink implements TimeSink {
         scope: 'setup',
         required: true,
         validate: v => /.+@.+/.test(String(v ?? '').trim()) ? undefined : 'Invalid email',
-        settingKey: 'timeit_logger.jira.email',
+        settingKey: 'clockit.jira.email',
       },
       {
         key: 'jira.apiToken',
@@ -52,7 +52,7 @@ export class JiraSink extends BaseSink implements TimeSink {
         scope: 'setup',
         required: true,
         description: 'Create at https://id.atlassian.com/manage/api-tokens',
-        secretKey: 'timeit_logger.jira.apiToken',
+        secretKey: 'clockit.jira.apiToken',
       },
       // Required at runtime so the orchestrator will prompt when Jira is selected.
       {

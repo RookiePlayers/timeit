@@ -32,7 +32,7 @@ export class NotionSink extends BaseSink implements TimeSink {
         scope: 'setup',
         required: true,
         description: 'Create a Notion internal integration and paste the token (starts with "ntn_")',
-        secretKey: 'timeit_logger.notion.apiToken',
+        secretKey: 'clockit.notion.apiToken',
       },
       {
         key: 'notion.destination',

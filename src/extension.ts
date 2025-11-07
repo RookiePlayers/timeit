@@ -34,11 +34,11 @@ export async function activate(ctx: vscode.ExtensionContext) {
   const cfg = vscode.workspace.getConfiguration();
 
   // ---- Backup manager boot ----
-  const enabled         = cfg.get<boolean>('timeit_logger.backup.enabled', true);
-  const intervalSeconds = cfg.get<number>('timeit_logger.backup.intervalSeconds', 60);
-  const directory       = cfg.get<string>('timeit_logger.backup.directory', '');
-  const filenamePrefix  = cfg.get<string>('timeit_logger.backup.filenamePrefix', 'backup_');
-  const csvDirFallback  = cfg.get<string>('timeit_logger.csv.outputDirectory', '');
+  const enabled         = cfg.get<boolean>('clockit.backup.enabled', true);
+  const intervalSeconds = cfg.get<number>('clockit.backup.intervalSeconds', 60);
+  const directory       = cfg.get<string>('clockit.backup.directory', '');
+  const filenamePrefix  = cfg.get<string>('clockit.backup.filenamePrefix', 'backup_');
+  const csvDirFallback  = cfg.get<string>('clockit.csv.outputDirectory', '');
 
   backup = new BackupManager({
     enabled,
@@ -52,8 +52,8 @@ export async function activate(ctx: vscode.ExtensionContext) {
   // Hot-reload backup config on change
   ctx.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration(e => {
-      if (!e.affectsConfiguration('timeit_logger.backup')) {return;}
-      const bcfg = vscode.workspace.getConfiguration('timeit_logger.backup');
+      if (!e.affectsConfiguration('clockit.backup')) {return;}
+      const bcfg = vscode.workspace.getConfiguration('clockit.backup');
 
       // stop old + start fresh with new config
       backup?.stop();
@@ -70,11 +70,11 @@ export async function activate(ctx: vscode.ExtensionContext) {
 
   // Ensure we flush if the process hits a fatal
   const onUncaught = async (err: unknown) => {
-    console.warn('[timeit_logger] uncaughtException', err);
+    console.warn('[clockit] uncaughtException', err);
     await backup?.flushNow();
   };
   const onRejection = async (err: unknown) => {
-    console.warn('[timeit_logger] unhandledRejection', err);
+    console.warn('[clockit] unhandledRejection', err);
     await backup?.flushNow();
   };
   process.on('uncaughtException', onUncaught);
@@ -94,14 +94,14 @@ export async function activate(ctx: vscode.ExtensionContext) {
   channel.appendLine('[TimeIt] activated');
 
   statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, TIMER_PRIORITY);
-  statusBar.command = 'timeit_logger.toggle';
+  statusBar.command = 'clockit.toggle';
   statusBar.show();
 
   // CSV menu button
   const csvMenuBtn = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, CSV_PRIORITY);
   csvMenuBtn.text = '$(folder) TimeIt CSV';
   csvMenuBtn.tooltip = 'TimeIt CSV actions';
-  csvMenuBtn.command = 'timeit_logger.csvMenu';
+  csvMenuBtn.command = 'clockit.csvMenu';
   csvMenuBtn.show();
   ctx.subscriptions.push(csvMenuBtn);
 
@@ -111,7 +111,7 @@ export async function activate(ctx: vscode.ExtensionContext) {
   // CSV menu command
   const csvSvc = CsvFolderService.getInstance(vscode, utils.notify.bind(utils));
   ctx.subscriptions.push(
-    vscode.commands.registerCommand('timeit_logger.csvMenu', () => csvSvc.showCsvMenu())
+    vscode.commands.registerCommand('clockit.csvMenu', () => csvSvc.showCsvMenu())
   );
 
   // ---- Register feature groups ----
@@ -121,16 +121,16 @@ export async function activate(ctx: vscode.ExtensionContext) {
 
   // Optional: expose an internal command so other modules can push snapshots without importing the function
   ctx.subscriptions.push(
-    vscode.commands.registerCommand('timeit_logger._internal.updateBackup', (s?: Session) => {
+    vscode.commands.registerCommand('clockit._internal.updateBackup', (s?: Session) => {
       updateBackupFromSession(s);
     })
   );
 
   // Auto-start (optional)
   const autoStart = vscode.workspace.getConfiguration()
-    .get<boolean>('timeit_logger.autoStartOnLaunch') ?? true;
+    .get<boolean>('clockit.autoStartOnLaunch') ?? true;
   if (autoStart) {
-    vscode.commands.executeCommand('timeit_logger.startTimeTracking');
+    vscode.commands.executeCommand('clockit.startTimeTracking');
   }
 
   // Flush/stop backup on extension dispose

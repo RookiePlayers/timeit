@@ -56,7 +56,7 @@ export class PromptService {
 
   private async readExisting(spec: FieldSpec): Promise<unknown> {
     if (spec.type === 'secret') {
-      const key = spec.secretKey || `timeit_logger.${spec.key}`;
+      const key = spec.secretKey || `clockit.${spec.key}`;
       const v = await this.secrets.get(key);
       if (exists(v)) {return v;}
     }
@@ -75,7 +75,7 @@ export class PromptService {
     if (spec.remember === false) {return;}
 
     if (spec.type === 'secret') {
-      const key = spec.secretKey || `timeit_logger.${spec.key}`;
+      const key = spec.secretKey || `clockit.${spec.key}`;
       await this.secrets.set(key, String(value ?? ''));
       return;
     }

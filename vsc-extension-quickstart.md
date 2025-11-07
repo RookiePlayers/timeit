@@ -31,7 +31,7 @@ https://github.com/user-attachments/assets/cfe60e7e-d0d2-4ba1-b17e-f685a0d48370
 1. Clone or download this repository:
 
    ```bash
-   git clone https://github.com/OverlyCreativeTech/timeit_logger.git
+   git clone https://github.com/OverlyCreativeTech/clockit.git
    cd timeit
    ```
 
@@ -114,13 +114,13 @@ Values are stored securely using:
 
 | Setting | Type | Default | Description |
 |----------|------|----------|-------------|
-| `timeit_logger.autoStartOnLaunch` | boolean | `true` | Start tracking automatically on launch. |
-| `timeit_logger.idleTimeoutMinutes` | number | `5` | Idle time threshold. |
-| `timeit_logger.showNotifications` | boolean | `true` | Show start/stop/export messages. |
-| `timeit_logger.askSinksEachTime` | boolean | `true` | Always prompt for sinks each session. |
-| `timeit_logger.enabledSinks` | string[] | `["csv"]` | Default sinks when prompting is off. |
-| `timeit_logger.csv.outputDirectory` | string | workspace root | CSV export folder. |
-| `timeit_logger.csv.filename` | string | `time_log.csv` | CSV log file name. |
+| `clockit.autoStartOnLaunch` | boolean | `true` | Start tracking automatically on launch. |
+| `clockit.idleTimeoutMinutes` | number | `5` | Idle time threshold. |
+| `clockit.showNotifications` | boolean | `true` | Show start/stop/export messages. |
+| `clockit.askSinksEachTime` | boolean | `true` | Always prompt for sinks each session. |
+| `clockit.enabledSinks` | string[] | `["csv"]` | Default sinks when prompting is off. |
+| `clockit.csv.outputDirectory` | string | workspace root | CSV export folder. |
+| `clockit.csv.filename` | string | `time_log.csv` | CSV log file name. |
 
 ---
 
@@ -128,9 +128,9 @@ Values are stored securely using:
 
 | Sink | Description | Config Keys |
 |------|--------------|-------------|
-| **CSV** | Writes session logs to a CSV file. | `timeit_logger.csv.outputDirectory`, `timeit_logger.csv.filename` |
-| **Jira** | Adds worklogs to Jira issues. | `timeit_logger.jira.domain`, `timeit_logger.jira.email`, `timeit_logger.jira.apiToken` |
-| **Notion** | (optional) Inserts session data into a Notion database. | `timeit_logger.notion.databaseId`, `timeit_logger.notion.token` |
+| **CSV** | Writes session logs to a CSV file. | `clockit.csv.outputDirectory`, `clockit.csv.filename` |
+| **Jira** | Adds worklogs to Jira issues. | `clockit.jira.domain`, `clockit.jira.email`, `clockit.jira.apiToken` |
+| **Notion** | (optional) Inserts session data into a Notion database. | `clockit.notion.databaseId`, `clockit.notion.token` |
 
 ---
 

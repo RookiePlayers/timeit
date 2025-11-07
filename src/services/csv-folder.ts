@@ -38,8 +38,8 @@ export class CsvFolderService {
 
 async getCsvRootAndFile() {
   const cfg = this.vscode.workspace.getConfiguration();
-  const outDir = (cfg.get<string>('timeit_logger.csv.outputDirectory') || '').trim();
-  const filename = cfg.get<string>('timeit_logger.csv.filename') || 'time_log.csv';
+  const outDir = (cfg.get<string>('clockit.csv.outputDirectory') || '').trim();
+  const filename = cfg.get<string>('clockit.csv.filename') || 'time_log.csv';
   const path = await import('path');
   const os = await import('os');
   const root =
@@ -120,9 +120,9 @@ async  chooseCsvFolder() {
 
   const folderUri = selection[0];
   const cfg = this.vscode.workspace.getConfiguration();
-  await cfg.update('timeit_logger.csv.outputDirectory', folderUri.fsPath, this.vscode.ConfigurationTarget.Workspace);
+  await cfg.update('clockit.csv.outputDirectory', folderUri.fsPath, this.vscode.ConfigurationTarget.Workspace);
 
-  const ensure = cfg.get<boolean>('timeit_logger.csv.ensureDirectory') ?? true;
+  const ensure = cfg.get<boolean>('clockit.csv.ensureDirectory') ?? true;
   if (ensure) {
     const fs = await import('fs/promises');
     await fs.mkdir(folderUri.fsPath, { recursive: true }).catch(() => {});

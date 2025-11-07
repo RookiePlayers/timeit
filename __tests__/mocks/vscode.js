@@ -4,19 +4,19 @@ exports.StatusBarAlignment = exports.commands = exports.extensions = exports.win
 exports.Uri = Uri;
 // Minimal VS Code API mock for unit tests
 const config = {
-    'timeit_logger.csv.outputDirectory': '',
-    'timeit_logger.csv.filename': 'time_log.csv',
-    'timeit_logger.csv.addHeaderIfMissing': true,
-    'timeit_logger.enableJira': false,
-    'timeit_logger.jira.domain': '',
-    'timeit_logger.jira.email': '',
-    'timeit_logger.jira.apiToken': '',
-    'timeit_logger.notion.enableNotion': false,
-    'timeit_logger.notion.apiToken': '',
-    'timeit_logger.notion.databaseId': '',
-    'timeit_logger.notion.pageId': '',
-    'timeit_logger.idleTimeoutMinutes': 5,
-    'timeit_logger.showNotifications': false,
+    'clockit.csv.outputDirectory': '',
+    'clockit.csv.filename': 'time_log.csv',
+    'clockit.csv.addHeaderIfMissing': true,
+    'clockit.enableJira': false,
+    'clockit.jira.domain': '',
+    'clockit.jira.email': '',
+    'clockit.jira.apiToken': '',
+    'clockit.notion.enableNotion': false,
+    'clockit.notion.apiToken': '',
+    'clockit.notion.databaseId': '',
+    'clockit.notion.pageId': '',
+    'clockit.idleTimeoutMinutes': 5,
+    'clockit.showNotifications': false,
 };
 exports.workspace = {
     name: 'TestWS',

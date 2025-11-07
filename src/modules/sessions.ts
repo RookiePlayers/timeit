@@ -6,13 +6,13 @@ import { Utils } from '../utils';
 
 export function registerSessionCommands(ctx: vscode.ExtensionContext, utils: Utils) {
   ctx.subscriptions.push(
-    vscode.commands.registerCommand('timeit_logger.startTimeTracking', () => startSession(utils)),
-    vscode.commands.registerCommand('timeit_logger.stopTimeTracking',  () => stopSession(utils)),
-    vscode.commands.registerCommand('timeit_logger.toggle',            () => toggleSession(utils)),
+    vscode.commands.registerCommand('clockit.startTimeTracking', () => startSession(utils)),
+    vscode.commands.registerCommand('clockit.stopTimeTracking',  () => stopSession(utils)),
+    vscode.commands.registerCommand('clockit.toggle',            () => toggleSession(utils)),
 
     // Back-compat
-    vscode.commands.registerCommand('timeit_logger.start',             () => startSession(utils)),
-    vscode.commands.registerCommand('timeit_logger.stop',              () => stopSession(utils)),
+    vscode.commands.registerCommand('clockit.start',             () => startSession(utils)),
+    vscode.commands.registerCommand('clockit.stop',              () => stopSession(utils)),
 
     // Mark activity
     vscode.workspace.onDidChangeTextDocument(() => utils.markActivity()),
@@ -59,13 +59,13 @@ async function stopSession(utils: Utils) {
   const finalSession = await pipeline.run(session);
 
   // Hand over to export flow
-  await vscode.commands.executeCommand('timeit_logger._exportSession', finalSession);
+  await vscode.commands.executeCommand('clockit._exportSession', finalSession);
 }
 
 function toggleSession(utils: Utils) {
   utils.isRunning()
-    ? vscode.commands.executeCommand('timeit_logger.stopTimeTracking')
-    : vscode.commands.executeCommand('timeit_logger.startTimeTracking');
+    ? vscode.commands.executeCommand('clockit.stopTimeTracking')
+    : vscode.commands.executeCommand('clockit.startTimeTracking');
 }
 
 async function getGitContext() {
