@@ -6,8 +6,8 @@
   "publisher": "octech",
   "icon": "icon.png",
   "license": "MIT",
-  "repository": "https://github.com/RookiePlayers/clockit.git",
-  "homepage": "https://github.com/RookiePlayers/clockit.git",
+  "repository": "https://github.com/RookiePlayers/timeit.git",
+  "homepage": "https://github.com/RookiePlayers/timeit.git",
   "engines": {
     "vscode": "^1.105.0"
   },
