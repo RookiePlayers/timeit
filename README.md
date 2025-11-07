@@ -7,6 +7,11 @@
 **TimeIt** helps developers log coding sessions automatically, add session comments, and export tracked time to **CSV**, **Jira**, or **Notion** — all within VS Code.
 
 ---
+<img width="1507" height="543" alt="Screenshot 2025-11-07 at 07 23 28" src="https://github.com/user-attachments/assets/1d259853-6291-4f15-9331-037adfbae9f2" />
+
+
+https://github.com/user-attachments/assets/cfe60e7e-d0d2-4ba1-b17e-f685a0d48370
+
 
 ## ✨ Features
 
