@@ -2,7 +2,7 @@
   "name": "clockit",
   "displayName": "ClockIt: Session manager",
   "description": "A time logger to track your coding sessions.",
-  "version": "0.0.4",
+  "version": "1.0.0",
   "publisher": "octech",
   "license": "MIT",
   "repository": "https://github.com/RookiePlayers/timeit.git",
