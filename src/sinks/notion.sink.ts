@@ -56,7 +56,7 @@ export class NotionSink extends BaseSink implements TimeSink {
         },
         validate: (v) => {
           const s = String(v ?? '');
-          if (!/^((database|page):)?[0-9a-fA-F-]{32,36}$/.test(s)) return 'Pick a Notion database or page';
+          if (!/^((database|page):)?[0-9a-fA-F-]{32,36}$/.test(s)) {return 'Pick a Notion database or page';}
           return undefined;
         },
       },
@@ -80,7 +80,7 @@ export class NotionSink extends BaseSink implements TimeSink {
 
   private parseDestination(): { type: 'database' | 'page'; id: string } | undefined {
     const raw = String(this.options['notion.destination'] || '').trim();
-    if (!raw) return undefined;
+    if (!raw) {return undefined;}
 
     const withType = raw.match(/^(database|page):(.+)$/i);
     if (withType) {
@@ -253,9 +253,9 @@ export class NotionSink extends BaseSink implements TimeSink {
         method: 'GET',
         headers: this.authHeaders(),
       });
-      if (res.status === 401 || res.status === 403) return 'AUTH_ERROR';
-      if (res.status === 404) return 'MISSING';
-      if (!res.ok) return 'MISSING';
+      if (res.status === 401 || res.status === 403) {return 'AUTH_ERROR';}
+      if (res.status === 404) {return 'MISSING';}
+      if (!res.ok) {return 'MISSING';}
 
       const data = await res.json() as {
         properties?: Record<string, { type: string }>;

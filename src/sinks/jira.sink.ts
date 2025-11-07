@@ -345,7 +345,7 @@ const searchForIssue = async ({
     jql,
     fields: ['key', 'summary', 'issuetype', 'project'],
   };
-  if (cursor) body.cursor = cursor;  // <— new pagination model
+  if (cursor) {body.cursor = cursor;}  // <— new pagination model
 
   const res = await fetchFn(url, {
     method: 'POST',
@@ -358,7 +358,7 @@ const searchForIssue = async ({
     signal,                           // <— allow aborts
   });
 
-  if (!res.ok) return { items: [], nextCursor: undefined };
+  if (!res.ok) {return { items: [], nextCursor: undefined };}
 
   const data = await res.json() as {
     issues?: Array<{ key: string; fields: { summary?: string } }>;
