@@ -1,48 +1,164 @@
-# timeit README
+# ⏱️ TimeIt – Developer-Friendly Time Tracker for VS Code
 
-This is the README for your extension "timeit". After writing up a brief description, we recommend including the following sections.
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://marketplace.visualstudio.com/items?itemName=octech.timeit)
+[![Build](https://github.com/OverlyCreativeTech/timeit/actions/workflows/ci.yml/badge.svg)](https://github.com/OverlyCreativeTech/timeit/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-## Features
+**TimeIt** helps developers log coding sessions automatically, add session comments, and export tracked time to **CSV**, **Jira**, or **Notion** — all within VS Code.
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+---
 
-For example if there is an image subfolder under your extension project workspace:
+## ✨ Features
 
-\!\[feature X\]\(images/feature-x.png\)
+- **Automatic time tracking** when you start coding  
+- **Idle detection & trimming** for accurate duration  
+- **Session comments** on stop  
+- **Multi-sink export** — CSV, Jira, Notion  
+- **Guided credential prompts** (stored securely)  
+- **Edit or clear credentials anytime**  
+- **Sink selection each session**  
+- **CSV menu** in the status bar for quick access  
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+---
 
-## Requirements
+## 🚀 Installation
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+1. Clone or download this repository:
+   ```bash
+   git clone https://github.com/OverlyCreativeTech/timeit.git
+   cd timeit
+   ```
+2. Install dependencies:
+   ```bash
+   yarn install
+   ```
+3. Launch in VS Code:
+   ```bash
+   code .
+   ```
+4. Press **F5** to start the extension in a new VS Code window.
 
-## Extension Settings
+---
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+## 🧩 Usage
 
-For example:
+### Start tracking
+- Click the **⏱️ timer** in the status bar or run:
+  ```
+  TimeIt: Start Tracking
+  ```
 
-This extension contributes the following settings:
+### Stop tracking
+- Click the timer again or run:
+  ```
+  TimeIt: Stop Tracking
+  ```
+- Add a session comment when prompted.
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+### Choose export sinks
+- On stop, you’ll be asked where to export the session (CSV, Jira, Notion).  
+- Only configured sinks will be active.
 
-## Known Issues
+### CSV quick actions
+Click the **📂 CSV** icon next to the timer to:
+- Change the CSV output folder  
+- View past logs  
+- Open logs in your editor  
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+---
 
-## Release Notes
+## 🔐 Credential Management
 
-Users appreciate release notes as you update your extension.
+### First-time setup
+When a sink (like Jira) is selected, TimeIt prompts you for:
+- Domain (e.g., `yourteam.atlassian.net`)
+- Email
+- API Token
 
-### 1.0.0
+Values are stored securely using:
+- **VS Code Secret Storage** for sensitive keys  
+- **Workspace Settings** for non-secret configuration
 
-Initial release of ...
+### Edit or clear credentials
+| Command | Description |
+|----------|-------------|
+| `TimeIt: Edit Credentials` | Edit existing sink credentials. |
+| `TimeIt: Clear Credentials` | Remove credentials for a specific sink or all. |
 
-### 1.0.1
+---
 
-Fixed issue #.
+## 🧮 Configuration Options
 
-### 1.1.0
+| Setting | Type | Default | Description |
+|----------|------|----------|-------------|
+| `timeit.autoStartOnLaunch` | boolean | `true` | Start tracking automatically on launch. |
+| `timeit.idleTimeoutMinutes` | number | `5` | Idle time threshold. |
+| `timeit.showNotifications` | boolean | `true` | Show start/stop/export messages. |
+| `timeit.askSinksEachTime` | boolean | `true` | Always prompt for sinks each session. |
+| `timeit.enabledSinks` | string[] | `["csv"]` | Default sinks when prompting is off. |
+| `timeit.csv.outputDirectory` | string | workspace root | CSV export folder. |
+| `timeit.csv.filename` | string | `time_log.csv` | CSV log file name. |
 
-Added features X, Y, and Z.
+---
+
+## 🧭 Supported Export Sinks
+
+| Sink | Description | Config Keys |
+|------|--------------|-------------|
+| **CSV** | Writes session logs to a CSV file. | `timeit.csv.outputDirectory`, `timeit.csv.filename` |
+| **Jira** | Adds worklogs to Jira issues. | `timeit.jira.domain`, `timeit.jira.email`, `timeit.jira.apiToken` |
+| **Notion** | (optional) Inserts session data into a Notion database. | `timeit.notion.databaseId`, `timeit.notion.token` |
+
+---
+
+## 🧪 Development
+
+### Run locally
+```bash
+yarn install
+yarn compile
+code .
+```
+
+### Test
+```bash
+yarn test
+```
+
+### Build release
+```bash
+vsce package
+```
+
+---
+
+## 🧱 Folder Structure
+
+```
+src/
+ ├─ core/
+ │   ├─ registry.ts        # Sink registry
+ │   ├─ orchestrator.ts    # Manages sink prompting + exports
+ │   ├─ prompts.ts         # Interactive field resolver
+ │   ├─ sessions.ts        # Session creation + idle trimming
+ │   └─ types.ts
+ │
+ ├─ sinks/
+ │   ├─ csv.sink.ts
+ │   ├─ jira.sink.ts
+ │   └─ notion.sink.ts
+ │
+ ├─ services/
+ │   └─ csv-folder.ts      # CSV quick menu handler
+ │
+ ├─ utils.ts               # Timer, status bar, notify helpers
+ └─ extension.ts           # Main entrypoint
+```
+
+---
+
+## 📄 License
+
+**MIT License**  
+© 2025 Overly Creative Tech
+
