@@ -1,7 +1,26 @@
 # Clockit – Developer-Friendly Time Tracker for VS Code
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://marketplace.visualstudio.com/items?itemName=octech.clockit)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+<p align="center">
+  <a href="https://marketplace.visualstudio.com/items?itemName=rookieplayers.timeit">
+    <img src="https://img.shields.io/visual-studio-marketplace/v/rookieplayers.timeit?label=VS%20Code%20Marketplace&color=007acc&logo=visualstudiocode" alt="Marketplace Version">
+  </a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=rookieplayers.timeit">
+    <img src="https://img.shields.io/visual-studio-marketplace/i/rookieplayers.timeit?label=Installs&color=brightgreen&logo=visualstudiocode" alt="Installs">
+  </a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=rookieplayers.timeit">
+    <img src="https://img.shields.io/visual-studio-marketplace/r/rookieplayers.timeit?label=Rating&color=ffb300&logo=starship&logoColor=white" alt="Rating">
+  </a>
+  <br />
+  <a href="https://github.com/RookiePlayers/timeit/actions/workflows/test.yml">
+    <img src="https://github.com/RookiePlayers/timeit/actions/workflows/test.yml/badge.svg" alt="Build Status">
+  </a>
+  <a href="https://github.com/RookiePlayers/timeit/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/RookiePlayers/timeit?color=blue" alt="License">
+  </a>
+  <a href="https://github.com/RookiePlayers/timeit">
+    <img src="https://img.shields.io/github/stars/RookiePlayers/timeit?style=social" alt="GitHub stars">
+  </a>
+</p>
 
 **Clockit** helps developers log coding sessions automatically, add session comments, and export tracked time to **CSV**, **Jira**, or **Notion** — all within VS Code.
 
