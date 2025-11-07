@@ -45,7 +45,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install deps
-        run: yarn install --immutable
+        run: npm ci
 
       - name: Determine dist-tag (tag-derived with target-env override)
         id: dist
