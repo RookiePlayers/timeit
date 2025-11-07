@@ -45,16 +45,25 @@
         "command": "timeit.chooseCsvFolder",
         "title": "TimeIt: Choose CSV Output Folder"
       },
-      { "command": "timeit.chooseSinks", "title": "TimeIt: Choose Sinks" },
-      { "command": "timeit.editCredentials", "title": "TimeIt: Edit Credentials" },
-      { "command": "timeit.clearCredentials", "title": "TimeIt: Clear Credentials" },
+      {
+        "command": "timeit.chooseSinks",
+        "title": "TimeIt: Choose Sinks"
+      },
+      {
+        "command": "timeit.editCredentials",
+        "title": "TimeIt: Edit Credentials"
+      },
+      {
+        "command": "timeit.clearCredentials",
+        "title": "TimeIt: Clear Credentials"
+      },
       {
         "command": "timeit.signIn.jira",
-        "title": "TimeIt: Sign in to Jira (Experimental)"
+        "title": "TimeIt: Sign in to Jira (Coming Soon)"
       },
       {
         "command": "timeit.signIn.notion",
-        "title": "TimeIt: Sign in to Notion (Experimental)"
+        "title": "TimeIt: Sign in to Notion (Coming Soon)"
       }
     ],
     "configuration": {
@@ -62,8 +71,17 @@
       "properties": {
         "timeit.enabledSinks": {
           "type": "array",
-          "items": { "type": "string", "enum": ["csv", "jira", "notion"] },
-          "default": ["csv"],
+          "items": {
+            "type": "string",
+            "enum": [
+              "csv",
+              "jira",
+              "notion"
+            ]
+          },
+          "default": [
+            "csv"
+          ],
           "description": "Select which sinks to use for exporting sessions."
         },
         "timeit.askSinksEachTime": {
@@ -156,9 +174,14 @@
     "watch": "tsc -watch -p tsconfig.json",
     "pretest": "yarn run compile && yarn run lint",
     "lint": "eslint src",
+    "postinstall": "npx husky",
     "test": "jest --runInBand"
   },
   "devDependencies": {
+    "@commitlint/config-conventional": "^20.0.0",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/npm": "^12.0.2",
     "@types/jest": "^29.5.12",
     "@types/mocha": "^10.0.10",
     "@types/node": "^22.19.0",
@@ -174,6 +197,7 @@
     "vsce": "2.15.0"
   },
   "dependencies": {
+    "commitlint": "^20.1.0",
     "dotenv": "^17.2.3",
     "fs": "^0.0.1-security",
     "os": "^0.1.2",

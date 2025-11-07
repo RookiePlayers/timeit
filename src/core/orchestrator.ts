@@ -79,7 +79,7 @@ export class ExportOrchestrator {
     specs: FieldSpec[],
     session: Session
   ): Promise<void> {
-    if (!specs?.length) return;
+    if (!specs?.length) {return;}
 
     // Ensure we have a mutable options bag we can hydrate
     const opts = ((sink as any).options = (sink as any).options ?? {});

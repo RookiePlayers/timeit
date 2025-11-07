@@ -1,29 +1,42 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const registry_1 = require("../src/core/registry");
-class FakeSink {
+class OkSink {
     cfg;
-    kind = 'fake';
+    kind = 'ok';
     constructor(cfg) {
         this.cfg = cfg;
     }
-    validate() { return { ok: this.cfg.enabled }; }
+    validate() { return { ok: true }; }
     async export() { return { ok: true, message: 'ok' }; }
 }
+class BadSink {
+    cfg;
+    kind = 'bad';
+    constructor(cfg) {
+        this.cfg = cfg;
+    }
+    validate() { return { ok: false, missing: ['x'] }; }
+    async export() { return { ok: true, message: 'bad' }; }
+}
 describe('SinkRegistry', () => {
-    it('registers and creates enabled sinks', () => {
+    it('creates known sinks', () => {
         const r = new registry_1.SinkRegistry();
-        r.register('fake', (cfg) => new FakeSink(cfg));
-        const sinks = r.create([
-            { kind: 'fake', enabled: true, options: {} },
-            { kind: 'fake', enabled: false, options: {} },
-        ]);
+        r.register('ok', (c) => new OkSink(c));
+        const sinks = r.create([{ kind: 'ok', enabled: true, options: {} }]);
         expect(sinks).toHaveLength(1);
-        expect(sinks[0].kind).toBe('fake');
+        expect(sinks[0].kind).toBe('ok');
     });
-    it('throws for unknown kind', () => {
+    it('skips unknown kind without throwing', () => {
         const r = new registry_1.SinkRegistry();
-        expect(() => r.create([{ kind: 'nope', enabled: true, options: {} }])).toThrow();
+        const sinks = r.create([{ kind: 'nope', enabled: true, options: {} }]);
+        expect(sinks).toHaveLength(0);
+    });
+    it('ignores disabled configs', () => {
+        const r = new registry_1.SinkRegistry();
+        r.register('ok', (c) => new OkSink(c));
+        const sinks = r.create([{ kind: 'ok', enabled: false, options: {} }]);
+        expect(sinks).toHaveLength(0);
     });
 });
 //# sourceMappingURL=core.registry.test.js.map
