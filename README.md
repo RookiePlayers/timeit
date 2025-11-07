@@ -24,18 +24,24 @@
 ## 🚀 Installation
 
 1. Clone or download this repository:
+
    ```bash
    git clone https://github.com/OverlyCreativeTech/timeit.git
    cd timeit
    ```
+
 2. Install dependencies:
+
    ```bash
    yarn install
    ```
+
 3. Launch in VS Code:
+
    ```bash
    code .
    ```
+
 4. Press **F5** to start the extension in a new VS Code window.
 
 ---
@@ -43,24 +49,32 @@
 ## 🧩 Usage
 
 ### Start tracking
+
 - Click the **⏱️ timer** in the status bar or run:
+
   ```
   TimeIt: Start Tracking
   ```
 
 ### Stop tracking
+
 - Click the timer again or run:
+
   ```
   TimeIt: Stop Tracking
   ```
+
 - Add a session comment when prompted.
 
 ### Choose export sinks
+
 - On stop, you’ll be asked where to export the session (CSV, Jira, Notion).  
 - Only configured sinks will be active.
 
 ### CSV quick actions
+
 Click the **📂 CSV** icon next to the timer to:
+
 - Change the CSV output folder  
 - View past logs  
 - Open logs in your editor  
@@ -70,16 +84,20 @@ Click the **📂 CSV** icon next to the timer to:
 ## 🔐 Credential Management
 
 ### First-time setup
+
 When a sink (like Jira) is selected, TimeIt prompts you for:
+
 - Domain (e.g., `yourteam.atlassian.net`)
 - Email
 - API Token
 
 Values are stored securely using:
+
 - **VS Code Secret Storage** for sensitive keys  
 - **Workspace Settings** for non-secret configuration
 
 ### Edit or clear credentials
+
 | Command | Description |
 |----------|-------------|
 | `TimeIt: Edit Credentials` | Edit existing sink credentials. |
@@ -114,6 +132,7 @@ Values are stored securely using:
 ## 🧪 Development
 
 ### Run locally
+
 ```bash
 yarn install
 yarn compile
@@ -121,38 +140,15 @@ code .
 ```
 
 ### Test
+
 ```bash
 yarn test
 ```
 
 ### Build release
+
 ```bash
 vsce package
-```
-
----
-
-## 🧱 Folder Structure
-
-```
-src/
- ├─ core/
- │   ├─ registry.ts        # Sink registry
- │   ├─ orchestrator.ts    # Manages sink prompting + exports
- │   ├─ prompts.ts         # Interactive field resolver
- │   ├─ sessions.ts        # Session creation + idle trimming
- │   └─ types.ts
- │
- ├─ sinks/
- │   ├─ csv.sink.ts
- │   ├─ jira.sink.ts
- │   └─ notion.sink.ts
- │
- ├─ services/
- │   └─ csv-folder.ts      # CSV quick menu handler
- │
- ├─ utils.ts               # Timer, status bar, notify helpers
- └─ extension.ts           # Main entrypoint
 ```
 
 ---
@@ -161,4 +157,3 @@ src/
 
 **MIT License**  
 © 2025 Overly Creative Tech
-
