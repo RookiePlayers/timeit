@@ -1,3 +1,10 @@
+# [1.12.0-dev.2](https://github.com/RookiePlayers/clockit/compare/v1.12.0-dev.1...v1.12.0-dev.2) (2026-01-23)
+
+
+### Bug Fixes
+
+* Refactor allowedOrigins handling to improve base64 decoding and fallback logic ([9f10d15](https://github.com/RookiePlayers/clockit/commit/9f10d15e47532579a26b0bfe67ea634883cfb98d))
+
 # [1.12.0-dev.1](https://github.com/RookiePlayers/clockit/compare/v1.11.7...v1.12.0-dev.1) (2026-01-23)
 
 
