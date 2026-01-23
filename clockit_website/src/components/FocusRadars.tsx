@@ -6,9 +6,11 @@ import { Range, rangeLabels } from "@/types";
 import { RadarPanel } from "./RadarPanel";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/lib/firebase";
+import ServerUnavailable from "@/components/ServerUnavailable";
+import { isServerUnavailableError } from "@/lib/api-client";
 
 type Props = {
-  statsError?: string | null;
+  statsError?: Error | null;
   initialRange?: Range;
 };
 
@@ -41,10 +43,14 @@ export default function FocusRadars({ initialRange = "week" }: Props) {
     );
   }
 
+  if (statsError && isServerUnavailableError(statsError)) {
+    return <ServerUnavailable />;
+  }
+
   if (statsError) {
     return (
       <section className="card-clean p-6 rounded-2xl space-y-6">
-        <p className="text-sm text-red-500">Error loading focus radars: {statsError}</p>
+        <p className="text-sm text-red-500">Error loading focus radars: {statsError.message}</p>
       </section>
     );
   }
@@ -73,13 +79,13 @@ export default function FocusRadars({ initialRange = "week" }: Props) {
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <RadarPanel
           title="Language focus"
-          emptyLabel={statsError || "No language time recorded for this range yet."}
+          emptyLabel={statsError?.message || "No language time recorded for this range yet."}
           data={radarData.map((d) => ({ label: d.language, hours: d.hours }))}
           color="#6366f1"
         />
         <RadarPanel
           title="Workspace focus"
-          emptyLabel={statsError || "No workspace time recorded for this range yet."}
+          emptyLabel={statsError?.message || "No workspace time recorded for this range yet."}
           data={workspaceRadarData.map((d) => ({ label: d.workspace, hours: d.hours }))}
           color="#0ea5e9"
         />

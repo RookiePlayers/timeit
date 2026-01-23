@@ -25,7 +25,34 @@ export type AggregateEntry = {
   topWorkspaces?: { workspace: string; seconds: MetricValue }[];
 };
 
-export type Aggregates = Partial<Record<Range, AggregateEntry[]>>;
+export type Aggregates = {
+  week: AggregateEntry[];
+  month: AggregateEntry[];
+  year: AggregateEntry[];
+  all_month: AggregateEntry[];
+  all: AggregateEntry[];
+  thisWeek: AggregateEntry | null;
+  thisMonth: AggregateEntry | null;
+  thisYear: AggregateEntry | null;
+};
+
+export function getAggregatesForRange(
+  aggregates: Aggregates | null | undefined,
+  range: Range
+): AggregateEntry[] {
+  if (!aggregates) {return [];}
+  switch (range) {
+    case "week":
+      return aggregates.week || [];
+    case "month":
+      return aggregates.month || [];
+    case "year":
+      return aggregates.year || [];
+    case "all":
+    default:
+      return aggregates.all_month?.length ? aggregates.all_month : aggregates.all || [];
+  }
+}
 
 export type Grade = { letter: string; description: string };
 

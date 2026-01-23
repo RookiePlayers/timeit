@@ -150,35 +150,38 @@ export default function Home() {
               desc: "Your data lives with you. Choose where to send it, or just keep the CSV locally.",
             },
           ].map((f) => (
-            <div key={f.title} className="p-5 rounded-xl border border-white/5 bg-white/5 shadow-sm hover:border-white/15 transition-colors">
-              <h3 className="text-lg font-semibold mb-2 text-white">{f.title}</h3>
-              <p className="text-sm text-white/70">{f.desc}</p>
+            <div
+              key={f.title}
+              className="p-5 rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-sm hover:bg-[var(--card-soft)] transition-colors"
+            >
+              <h3 className="text-lg font-semibold mb-2 text-[var(--text)]">{f.title}</h3>
+              <p className="text-sm text-[var(--muted)]">{f.desc}</p>
             </div>
           ))}
         </section>
 
         <section id="workflow" className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
           <div className="space-y-4">
-            <p className="text-sm uppercase tracking-[0.2em] text-blue-200/70">Workflow</p>
-            <h2 className="text-3xl font-bold text-white">Install, code, export. That’s it.</h2>
-            <ol className="space-y-3 text-white/80">
-              <li><strong className="text-white">1.</strong> Install Clockit for your editor and start coding—sessions begin automatically.</li>
-              <li><strong className="text-white">2.</strong> Idle time is trimmed; per-language focus is captured without setup.</li>
-              <li><strong className="text-white">3.</strong> Export to CSV/Jira/Notion or view dashboards (no login needed to download).</li>
+            <p className="text-sm uppercase tracking-[0.2em] text-[var(--muted)]">Workflow</p>
+            <h2 className="text-3xl font-bold text-[var(--text)]">Install, code, export. That’s it.</h2>
+            <ol className="space-y-3 text-[var(--muted)]">
+              <li><strong className="text-[var(--text)]">1.</strong> Install Clockit for your editor and start coding—sessions begin automatically.</li>
+              <li><strong className="text-[var(--text)]">2.</strong> Idle time is trimmed; per-language focus is captured without setup.</li>
+              <li><strong className="text-[var(--text)]">3.</strong> Export to CSV/Jira/Notion or view dashboards (no login needed to download).</li>
             </ol>
             <div className="flex gap-3">
               <InstallButton variant="hero" />
               <ReadDocsButton variant="hero" />
             </div>
           </div>
-          <div className="rounded-2xl border border-white/5 bg-gradient-to-br from-blue-500/10 via-violet-500/10 to-emerald-500/10 p-6 space-y-4">
-            <div className="flex items-center justify-between text-sm text-white/70 flex-wrap gap-2">
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--card-soft)] p-6 space-y-4">
+            <div className="flex items-center justify-between text-sm text-[var(--muted)] flex-wrap gap-2">
               <span>Snapshot of exports</span>
-              <span className="px-3 py-1 rounded-full bg-white/10 text-white/80 text-xs">Live CSV</span>
+              <span className="px-3 py-1 rounded-full bg-[var(--pill)] text-[var(--text)] text-xs">Live CSV</span>
             </div>
-            <div className="overflow-x-auto rounded-xl border border-white/10 bg-black/50">
-              <table className="min-w-[600px] w-full text-xs sm:text-sm text-white/80">
-                <thead className="bg-white/5 text-white/60">
+            <div className="overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--card)]">
+              <table className="min-w-[600px] w-full text-xs sm:text-sm text-[var(--text)]">
+                <thead className="bg-[var(--card-soft)] text-[var(--muted)]">
                   <tr>
                     {["startedIso", "endedIso", "durationSeconds", "idleSeconds", "perLanguageSeconds"].map((h) => (
                       <th key={h} className="px-3 py-2 text-left font-semibold whitespace-nowrap">{h}</th>
@@ -191,7 +194,7 @@ export default function Home() {
                     { start: "2025-01-03T11:10:00Z", end: "2025-01-03T11:42:00Z", dur: "1920", idle: "90", lang: '{"tsx":1500,"css":330}' },
                     { start: "2025-01-03T13:00:00Z", end: "2025-01-03T13:55:00Z", dur: "3300", idle: "180", lang: '{"go":2940,"sh":180}' },
                   ].map((row, i) => (
-                    <tr key={i} className="border-t border-white/5">
+                    <tr key={i} className="border-t border-[var(--border)]">
                       <td className="px-3 py-2 font-mono text-[11px] sm:text-xs whitespace-nowrap">{row.start}</td>
                       <td className="px-3 py-2 font-mono text-[11px] sm:text-xs whitespace-nowrap">{row.end}</td>
                       <td className="px-3 py-2">{row.dur}</td>
@@ -202,15 +205,15 @@ export default function Home() {
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-white/60">CSV export stays local by default. Push to cloud/Jira/Notion only when you choose.</p>
+            <p className="text-xs text-[var(--muted)]">CSV export stays local by default. Push to cloud/Jira/Notion only when you choose.</p>
           </div>
         </section>
 
-        <section className="rounded-2xl border border-white/5 bg-gradient-to-r from-blue-600/20 via-violet-600/20 to-emerald-500/20 px-6 py-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <section className="rounded-2xl theme-callout px-6 py-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <p className="text-sm uppercase tracking-[0.2em] text-blue-100/80">Ready to get started?</p>
-            <h3 className="text-2xl font-bold text-white mt-1">Grab the extension or read the docs before you sign in.</h3>
-            <p className="text-sm text-white/80 mt-2">Sign in lives in the nav when you’re ready to see your dashboard.</p>
+            <p className="text-sm uppercase tracking-[0.2em] text-[var(--muted)]">Ready to get started?</p>
+            <h3 className="text-2xl font-bold text-[var(--text)] mt-1">Grab the extension or read the docs before you sign in.</h3>
+            <p className="text-sm text-[var(--muted)] mt-2">Sign in lives in the nav when you’re ready to see your dashboard.</p>
           </div>
           <div className="flex flex-wrap gap-3">
             <InstallButton variant="hero" />

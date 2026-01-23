@@ -8,8 +8,8 @@ dotenv.config();
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  PORT: z.string().default('3001').transform(Number),
-  API_BASE_URL: z.string().url().default('http://localhost:3001'),
+  PORT: z.string().default('4001').transform(Number),
+  API_BASE_URL: z.string().url().default('http://localhost:4001'),
   FIREBASE_SERVICE_ACCOUNT_B64: z.string().min(1),
   ALLOWED_ORIGINS: z.string().default('http://localhost:3000'),
   RATE_LIMIT_WINDOW_MS: z.string().default('900000').transform(Number),

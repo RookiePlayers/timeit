@@ -1,3 +1,4 @@
+import { Timestamp } from 'firebase-admin/firestore';
 import { FirestoreService } from './firestore.service';
 import type { MaterializedStats, Achievement } from '@/types/stats.types';
 
@@ -12,6 +13,18 @@ export class StatsService {
   static async getStats(uid: string): Promise<MaterializedStats | null> {
     const documentPath = `${MATERIALIZED_STATS_COLLECTION}/${uid}`;
     const stats = await FirestoreService.getDocument<MaterializedStats>(documentPath);
+    //convert the Firebase Timestamp fields to ISO strings if they exist
+    if (stats) {
+      if ((stats as any).updatedAt) {
+        const ts = (stats as any).updatedAt as Timestamp;
+        (stats as any).updatedAt = ts.toDate().toISOString();
+      }
+      if ((stats as any).lastAggregatedAt
+) {
+        const dt = (stats as any).lastAggregatedAt as Timestamp;
+        (stats as any).lastAggregatedAt = dt.toDate().toISOString();
+      }
+    }
     return stats;
   }
 

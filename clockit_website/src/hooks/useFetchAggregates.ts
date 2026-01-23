@@ -2,12 +2,12 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { statsApi } from "@/lib/api-client";
-import { Aggregates, MetricValue, Range } from "@/types";
+import { Aggregates, getAggregatesForRange, MetricValue, Range } from "@/types";
 
 type HookState = {
     aggregates: Aggregates | null;
     isLoading: boolean;
-    error: string | null;
+    error: Error | null;
     message: string | null;
     lastRefresh: number | null;
 };
@@ -45,7 +45,8 @@ export function useFetchAggregates(userId: string | null | undefined) {
             });
         } catch (err) {
             const msg = err instanceof Error ? err.message : "Failed to load stats";
-            setState((prev) => ({ ...prev, isLoading: false, error: msg, message: null }));
+            const error = err instanceof Error ? err : new Error("Failed to load stats");
+            setState((prev) => ({ ...prev, isLoading: false, error, message: null }));
         }
     }, [userId]);
 
@@ -98,7 +99,7 @@ export function toHours(value: MetricValue | undefined | null) {
 
 export function languageTotalsForRange(aggregates: Aggregates | null, range: Range) {
     const totals: Record<string, number> = {};
-    const entries = aggregates?.[range] ?? [];
+    const entries = getAggregatesForRange(aggregates, range);
     for (const entry of entries) {
         const langSeconds = entry.languageSeconds || {};
         for (const [lang, seconds] of Object.entries(langSeconds)) {
@@ -110,7 +111,7 @@ export function languageTotalsForRange(aggregates: Aggregates | null, range: Ran
 
 export function workspaceTotalsForRange(aggregates: Aggregates | null, range: Range) {
     const totals: Record<string, number> = {};
-    const entries = aggregates?.[range] ?? [];
+    const entries = getAggregatesForRange(aggregates, range);
     for (const entry of entries) {
         const wsSeconds = entry.workspaceSeconds || {};
         const hasWorkspaceSeconds = Object.keys(wsSeconds).length > 0;
@@ -127,7 +128,7 @@ export function workspaceTotalsForRange(aggregates: Aggregates | null, range: Ra
 }
 
 export function computeRangeTotals(aggregates: Aggregates | null, range: Range) {
-    const entries = aggregates?.[range] ?? [];
+    const entries = getAggregatesForRange(aggregates, range);
     if (!entries.length) { return null; }
     return entries.reduce(
         (acc, entry) => ({

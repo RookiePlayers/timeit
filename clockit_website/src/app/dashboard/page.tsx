@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/lib/firebase";
-import { statsApi } from "@/lib/api-client";
+import { isServerUnavailableError, statsApi } from "@/lib/api-client";
 import Link from "next/link";
 import UploadCSV from "@/components/UploadCSV";
 import Stats from "@/components/Stats";
@@ -15,32 +15,8 @@ import { buildNavLinks, isFeatureEnabledForNav } from "@/utils/navigation";
 import FocusRadars from "@/components/FocusRadars";
 import RefreshAggregates from "@/components/RefreshAggregates";
 import { metricSum } from "@/hooks/useFetchAggregates";
-
-type Range = "week" | "month" | "year" | "all";
-
-type MetricStats = {
-  sum: number;
-  avg: number;
-  min: number;
-  max: number;
-};
-
-type MetricValue = number | MetricStats;
-
-type AggregateEntry = {
-  periodStart: string;
-  totalSeconds: MetricValue;
-  idleSeconds: MetricValue;
-  workingSeconds: MetricValue;
-  languageSeconds?: Record<string, MetricValue>;
-  topWorkspaces?: Array<{ workspace: string; seconds: MetricValue }>;
-  workspaceSeconds?: Record<string, MetricValue>;
-  productivityScore?: number;
-  productivityPercent: number;
-  topLanguage?: { language: string; seconds: MetricValue } | null;
-};
-
-type Aggregates = Partial<Record<Range, AggregateEntry[]>>;
+import { AggregateEntry, Aggregates, MetricValue, Range } from "@/types";
+import ServerUnavailable from "@/components/ServerUnavailable";
 
 const rangeLabels: Record<Range, string> = {
   week: "This week",
@@ -56,10 +32,10 @@ export default function DashboardPage() {
   const [, setFocusRange] = useState<Range>("week");
   const [aggregates, setAggregates] = useState<Aggregates | null>(null);
   const [isLoadingStats, setIsLoadingStats] = useState(true);
-  const [statsError, setStatsError] = useState<string | null>(null);
+  const [statsError, setStatsError] = useState<Error | null>(null);
   const router = useRouter();
-  const [lastRefresh, setLastRefresh] = useState<number | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<number | null>(null);
+  const [lastRefresh, setLastRefresh] = useState<number | null | { _seconds: number; _nanoseconds: number }>(null);
+  const [lastUpdated, setLastUpdated] = useState<number | null | { _seconds: number; _nanoseconds: number }>(null);
   const [statsRefreshKey, setStatsRefreshKey] = useState(0);
   const COOLDOWN_MS = 60 * 60 * 1000; // 1 hour
 
@@ -81,14 +57,14 @@ export default function DashboardPage() {
       try {
         const data = await statsApi.get() as {
           aggregates?: Aggregates;
-          lastRefreshRequested?: number;
-          lastAggregatedAt?: number;
-          updatedAt?: number;
+          lastRefreshRequested?: number | { _seconds: number; _nanoseconds: number };
+          lastAggregatedAt?: number | { _seconds: number; _nanoseconds: number };
+          updatedAt?: number | { _seconds: number; _nanoseconds: number };
         };
 
         if (!data) {
           setAggregates(null);
-          setStatsError("No aggregated stats found yet.");
+          setStatsError(new Error("No aggregated stats found yet."));
           return;
         }
 
@@ -102,8 +78,8 @@ export default function DashboardPage() {
         const chosen = aggregateTs || updatedTs || ts || null;
         setLastUpdated(chosen);
       } catch (err) {
-        const msg = err instanceof Error ? err.message : "Failed to load stats";
-        setStatsError(msg);
+        const error = err instanceof Error ? err : new Error("Failed to load stats");
+        setStatsError(error);
       } finally {
         setIsLoadingStats(false);
       }
@@ -113,11 +89,22 @@ export default function DashboardPage() {
   }, [user]);
 
   const active = useMemo(() => {
-    const list = aggregates?.[range];
-    console.log("Aggregates for range", range, list);
-    if (!list || list.length === 0) return undefined;
-    const sorted = [...list].sort((a, b) => (a.periodStart > b.periodStart ? -1 : 1));
-    return sorted[0];
+    if (!aggregates) {return undefined;}
+    const pickLatest = (list: AggregateEntry[] | undefined) => {
+      if (!list || list.length === 0) {return undefined;}
+      return [...list].sort((a, b) => (a.periodStart > b.periodStart ? -1 : 1))[0];
+    };
+    switch (range) {
+      case "week":
+        return aggregates.thisWeek ? aggregates.thisWeek : null;
+      case "month":
+        return aggregates.thisMonth ? aggregates.thisMonth : null;
+      case "year":
+        return aggregates.thisYear ? aggregates.thisYear : null;
+      case "all":
+      default:
+        return pickLatest(aggregates.all);
+    }
   }, [aggregates, range]);
 
 
@@ -192,8 +179,12 @@ export default function DashboardPage() {
     );
   }
 
-  const title = user.displayName || user.email || "Developer";
+  if (statsError && isServerUnavailableError(statsError)) {
+    return <ServerUnavailable />;
+  }
 
+  const title = user.displayName || user.email || "Developer";
+console.log('Rendering dashboard for user:', lastUpdated);
   return (
     <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
       <NavBar
@@ -210,7 +201,7 @@ export default function DashboardPage() {
             <h1 className="text-3xl font-bold text-[var(--text)]">Your productivity at a glance</h1>
             <p className="text-sm text-[var(--muted)] mt-1">
               Data shown for {rangeLabels[range].toLowerCase()}
-              {lastUpdated ? ` — last updated ${new Date(lastUpdated).toLocaleString()}` : ""}.
+              {lastUpdated ? ` — last updated ${new Date(lastUpdated?._seconds ? lastUpdated._seconds * 1000 : 0).toLocaleString()}` : ""}.
             </p>
           </div>
           <div className="flex flex-wrap gap-2 items-center">
@@ -250,7 +241,7 @@ export default function DashboardPage() {
                 <MetricRow icon={<IconHourglassEmpty />} label="Idle time" value={formatDuration(active.idleSeconds)} />
               </div>
             ) : (
-              <p className="text-sm text-[var(--muted)]">{statsError || "No data available."}</p>
+              <p className="text-sm text-[var(--muted)]">{statsError?.message || "No data available."}</p>
             )}
           </div>
 
@@ -268,7 +259,7 @@ export default function DashboardPage() {
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-[var(--muted)]">{statsError || "No language data available."}</p>
+              <p className="text-sm text-[var(--muted)]">{statsError?.message || "No language data available."}</p>
             )}
           </div>
 
@@ -298,14 +289,14 @@ export default function DashboardPage() {
                 </p>
               </div>
             ) : (
-              <p className="text-sm text-[var(--muted)]">{statsError || "No productivity data available."}</p>
+              <p className="text-sm text-[var(--muted)]">{statsError?.message || "No productivity data available."}</p>
             )}
           </div>
 
           <div className=" border border-[var(--border)] bg-[var(--card)] card-clean shadow-lg shadow-blue-900/10 p-6 rounded-2xl">
             <h2 className="text-lg font-semibold text-[var(--text)] mb-4">Top workspaces</h2>
             {topWorkspaces.length === 0 ? (
-              <p className="text-sm text-[var(--muted)]">{statsError || "No workspace data available."}</p>
+              <p className="text-sm text-[var(--muted)]">{statsError?.message || "No workspace data available."}</p>
             ) : (
               <div className="space-y-2">
                 {topWorkspaces.map((ws, idx) => (
