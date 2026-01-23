@@ -4,11 +4,21 @@ class RedisService {
   private client: RedisClientType | null = null;
   private isConnecting = false;
   private connectionPromise: Promise<void> | null = null;
+  private readonly redisUrl = process.env.REDIS_URL;
+  private readonly connectTimeoutMs = Number(process.env.REDIS_CONNECT_TIMEOUT_MS || 1000);
+  private readonly availabilityTtlMs = Number(process.env.REDIS_AVAILABILITY_TTL_MS || 2000);
+  private readonly unavailableCooldownMs = Number(process.env.REDIS_UNAVAILABLE_COOLDOWN_MS || 5000);
+  private unavailableUntil = 0;
+  private lastAvailabilityCheck = 0;
+  private cachedAvailability: boolean | null = null;
 
   /**
    * Initialize Redis client
    */
   private async initClient(): Promise<void> {
+    if (!this.redisUrl) {
+      throw new Error('REDIS_URL not set');
+    }
     if (this.client && this.client.isOpen) {
       return;
     }
@@ -22,6 +32,9 @@ class RedisService {
 
     try {
       await this.connectionPromise;
+    } catch (err) {
+      this.unavailableUntil = Date.now() + this.unavailableCooldownMs;
+      throw err;
     } finally {
       this.isConnecting = false;
       this.connectionPromise = null;
@@ -29,7 +42,10 @@ class RedisService {
   }
 
   private async _connect(): Promise<void> {
-    const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+    const redisUrl = this.redisUrl;
+    if (!redisUrl) {
+      throw new Error('REDIS_URL not set');
+    }
 
     this.client = createClient({
       url: redisUrl,
@@ -38,6 +54,7 @@ class RedisService {
           // Reconnect after exponential backoff, max 3 seconds
           return Math.min(retries * 50, 3000);
         },
+        connectTimeout: this.connectTimeoutMs,
       },
     });
 
@@ -57,13 +74,29 @@ class RedisService {
       console.log('Redis Client Reconnecting');
     });
 
-    await this.client.connect();
+    try {
+      await this.connectWithTimeout(this.connectTimeoutMs);
+    } catch (err) {
+      try {
+        await this.client.disconnect();
+      } catch {
+        // Best-effort cleanup; we'll fall back to memory.
+      }
+      this.client = null;
+      throw err;
+    }
   }
 
   /**
    * Get the Redis client, initializing if necessary
    */
   private async getClient(): Promise<RedisClientType> {
+    if (!this.redisUrl) {
+      throw new Error('REDIS_URL not set');
+    }
+    if (Date.now() < this.unavailableUntil) {
+      throw new Error('Redis unavailable (cooldown)');
+    }
     if (!this.client || !this.client.isOpen) {
       await this.initClient();
     }
@@ -75,16 +108,71 @@ class RedisService {
     return this.client;
   }
 
+  private async connectWithTimeout(timeoutMs: number): Promise<void> {
+    if (!this.client) {
+      throw new Error('Redis client not initialized');
+    }
+
+    let timeoutId: NodeJS.Timeout | null = null;
+    try {
+      await Promise.race([
+        this.client.connect(),
+        new Promise<never>((_, reject) => {
+          timeoutId = setTimeout(() => reject(new Error('Redis connect timeout')), timeoutMs);
+        }),
+      ]);
+    } finally {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    }
+  }
+
+  private async pingWithTimeout(timeoutMs: number): Promise<void> {
+    const client = await this.getClient();
+    let timeoutId: NodeJS.Timeout | null = null;
+    try {
+      await Promise.race([
+        client.ping(),
+        new Promise<never>((_, reject) => {
+          timeoutId = setTimeout(() => reject(new Error('Redis ping timeout')), timeoutMs);
+        }),
+      ]);
+    } finally {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    }
+  }
+
   /**
    * Check if Redis is available
    */
   async isAvailable(): Promise<boolean> {
+    if (!this.redisUrl) {
+      return false;
+    }
+
+    const now = Date.now();
+    if (this.cachedAvailability !== null && now - this.lastAvailabilityCheck < this.availabilityTtlMs) {
+      return this.cachedAvailability;
+    }
+    if (now < this.unavailableUntil) {
+      this.cachedAvailability = false;
+      this.lastAvailabilityCheck = now;
+      return false;
+    }
+
     try {
-      const client = await this.getClient();
-      await client.ping();
+      await this.pingWithTimeout(this.connectTimeoutMs);
+      this.cachedAvailability = true;
+      this.lastAvailabilityCheck = now;
       return true;
     } catch (err) {
       console.warn('Redis is not available:', err);
+      this.cachedAvailability = false;
+      this.lastAvailabilityCheck = now;
+      this.unavailableUntil = now + this.unavailableCooldownMs;
       return false;
     }
   }
