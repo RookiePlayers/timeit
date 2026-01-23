@@ -27,7 +27,7 @@ export function UploadSection() {
       {/* Show message if user cannot delete */}
       <Cannot I="delete" a="Upload">
         <div className="text-sm text-amber-600">
-          You don't have permission to delete uploads. Contact your administrator.
+          You don&apos;t have permission to delete uploads. Contact your administrator.
         </div>
       </Cannot>
     </div>

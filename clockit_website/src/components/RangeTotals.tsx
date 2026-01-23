@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { Aggregates, MetricStats, MetricValue, Range, rangeLabels } from "@/types";
+import { Aggregates, getAggregatesForRange, MetricStats, MetricValue, Range, rangeLabels } from "@/types";
 
 type Mode = "sum" | "avg" | "min" | "max";
 
@@ -12,7 +12,7 @@ export default function RangeTotals({
 }: {
   aggregates: Aggregates | null;
   range: Range;
-  statsError?: string | null;
+  statsError?: Error | null;
 }) {
   const [mode, setMode] = useState<Mode>("sum");
   const [languagePage, setLanguagePage] = useState(0);
@@ -44,7 +44,7 @@ export default function RangeTotals({
     [mode]
   );
 
-  const entries = useMemo(() => aggregates?.[range] ?? [], [aggregates, range]);
+  const entries = useMemo(() => getAggregatesForRange(aggregates, range), [aggregates, range]);
 
   const rangeTotals = useMemo(() => {
     if (!entries.length) {return null;}
@@ -140,7 +140,7 @@ export default function RangeTotals({
       </div>
 
       {!rangeTotals ? (
-        <p className="text-sm text-gray-500">{statsError || "No aggregated data yet for this range."}</p>
+        <p className="text-sm text-gray-500">{statsError?.message || "No aggregated data yet for this range."}</p>
       ) : (
         <>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

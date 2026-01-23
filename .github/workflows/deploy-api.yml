@@ -2,13 +2,17 @@ name: Deploy API to Cloud Run
 
 on:
   workflow_call:
-  push:
-    branches:
-      - main
-    paths:
-      - 'clockit_api/**'
-      - 'cloudbuild-api.yaml'
-      - '.github/workflows/deploy-api.yml'
+    inputs:
+      target-env:
+        required: true
+        type: string
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'clockit_api/**'
+  #     - 'cloudbuild-api.yaml'
+  #     - '.github/workflows/deploy-api.yml'
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
@@ -19,7 +23,7 @@ jobs:
   deploy:
     name: Deploy API
     runs-on: ubuntu-latest
-
+    environment: ${{ inputs.target-env }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -43,9 +47,36 @@ jobs:
 
       - name: Build and Deploy to Cloud Run
         run: |
+          # Build substitutions string - only include non-empty secrets
+          SUBS="COMMIT_SHA=${{ github.sha }}"
+          SUBS="$SUBS,_REDIS_URL=${{ secrets.REDIS_URL }}"
+          SUBS="$SUBS,_FIREBASE_SERVICE_ACCOUNT_B64=${{ secrets.FIREBASE_SERVICE_ACCOUNT_B64 }}"
+          SUBS="$SUBS,_ALLOWED_ORIGINS=${{ secrets.ALLOWED_ORIGINS }}"
+
+          # Add optional secrets only if they're set and don't contain problematic characters
+          if [ -n "${{ secrets.RATE_LIMIT_WINDOW_MS }}" ]; then
+            SUBS="$SUBS,_RATE_LIMIT_WINDOW_MS=${{ secrets.RATE_LIMIT_WINDOW_MS }}"
+          fi
+          if [ -n "${{ secrets.RATE_LIMIT_MAX_REQUESTS }}" ]; then
+            SUBS="$SUBS,_RATE_LIMIT_MAX_REQUESTS=${{ secrets.RATE_LIMIT_MAX_REQUESTS }}"
+          fi
+          if [ -n "${{ secrets.LOG_LEVEL }}" ]; then
+            SUBS="$SUBS,_LOG_LEVEL=${{ secrets.LOG_LEVEL }}"
+          fi
+          if [ -n "${{ secrets.ENABLE_ADMIN_SETUP }}" ]; then
+            SUBS="$SUBS,_ENABLE_ADMIN_SETUP=${{ secrets.ENABLE_ADMIN_SETUP }}"
+          fi
+          if [ -n "${{ secrets.ADMIN_SETUP_TOKEN }}" ]; then
+            SUBS="$SUBS,_ADMIN_SETUP_TOKEN=${{ secrets.ADMIN_SETUP_TOKEN }}"
+          fi
+          if [ -n "${{ secrets.INITIAL_ADMIN_EMAILS }}" ]; then
+            SUBS="$SUBS,_INITIAL_ADMIN_EMAILS=${{ secrets.INITIAL_ADMIN_EMAILS }}"
+          fi
+
           gcloud builds submit \
             --config cloudbuild-api.yaml \
-            --substitutions=COMMIT_SHA=${{ github.sha }}
+            --substitutions="$SUBS"
+        # Note: API_BASE_URL is auto-detected from existing Cloud Run service
 
       - name: Get Service URL
         id: get-url

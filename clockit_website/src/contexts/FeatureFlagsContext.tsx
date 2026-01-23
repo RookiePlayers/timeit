@@ -205,11 +205,27 @@ export function FeatureFlagsProvider({ children, userId }: FeatureFlagsProviderP
   // Load feature flags when userId changes
   useEffect(() => {
     if (!userId) {
-      // No user, use guest entitlement
-      setEntitlement(DEFAULT_GUEST_ENTITLEMENT);
-      setFeatureGroups([]);
-      setLoading(false);
-      setError(null);
+      const loadGuestFlags = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          const guestEntitlement = await getUserFeatureEntitlement(null);
+          const groups = guestEntitlement.featureGroups?.length
+            ? await getFeatureGroupsByIds(guestEntitlement.featureGroups)
+            : [];
+          setEntitlement(guestEntitlement);
+          setFeatureGroups(groups);
+        } catch (err) {
+          const errorObj = err instanceof Error ? err : new Error("Failed to load guest feature flags");
+          setError(errorObj);
+          setEntitlement(DEFAULT_GUEST_ENTITLEMENT);
+          setFeatureGroups([]);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      void loadGuestFlags();
       return;
     }
 

@@ -1,4 +1,4 @@
-import { ClockitSession, ClockitSessionUpload } from "@/types";
+import { ClockitSessionUpload } from "@/types";
 
 export const toDateKey = (iso: string) => iso.slice(0, 10);
 

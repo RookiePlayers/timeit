@@ -13,18 +13,37 @@ import { logger } from './utils/logger';
 export const createApp = (): Application => {
   const app = express();
 
+  // Trust proxy headers from Cloud Run / reverse proxies
+  // This is required for express-rate-limit to correctly identify client IPs
+  app.set('trust proxy', true);
+
   app.use(helmet());
 
   app.use(
     cors({
       origin: (origin, callback) => {
-        if (!origin || config.allowedOrigins.includes(origin)) {
+        // Allow requests with no origin (like mobile apps, curl, Postman)
+        if (!origin) {
+          callback(null, true);
+          return;
+        }
+
+        // Normalize origin by removing trailing slash
+        const normalizedOrigin = origin.replace(/\/$/, '');
+        const normalizedAllowedOrigins = config.allowedOrigins.map(o => o.replace(/\/$/, ''));
+
+        if (normalizedAllowedOrigins.includes(normalizedOrigin)) {
           callback(null, true);
         } else {
+          logger.warn(`CORS blocked origin: ${origin}`, {
+            allowedOrigins: config.allowedOrigins,
+          });
           callback(new Error('Not allowed by CORS'));
         }
       },
       credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
     })
   );
 

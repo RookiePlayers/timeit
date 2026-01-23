@@ -34,7 +34,7 @@ export function useFeatureGroups(featureGroupIds: string[] | undefined) {
     }
 
     fetchFeatureGroups();
-  }, [featureGroupIds?.join(',')]); // Join IDs for stable dependency
+  }, [featureGroupIds]); // Join IDs for stable dependency
 
   return { featureGroups, loading, error };
 }

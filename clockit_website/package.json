@@ -6,9 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "seed:feature-flags": "node scripts/seedFeatureFlags.js",
-    "seed:feature-entitlements": "node scripts/seedFeatureEntitlements.js"
+    "lint": "eslint --fix",
+    "validate": "tsc --noEmit && npm run lint"
+
   },
   "dependencies": {
     "@casl/ability": "^6.7.5",

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { uploadsApi, UploadListItem, ApiError } from "@/lib/api-client";
+import { uploadsApi, ApiError, UploadResponse } from "@/lib/api-client";
 import {
   LineChart,
   Line,
@@ -23,18 +23,7 @@ interface StatsProps {
   refreshKey?: number;
 }
 
-interface UploadWithData extends UploadListItem {
-  data?: Array<{
-    endedIso?: string;
-    endedISO?: string;
-    durationSeconds?: number;
-  }>;
-  filename?: string;
-  ideName?: string;
-  meta?: {
-    ideName?: string;
-  };
-}
+export type UploadWithData = UploadResponse;
 
 export default function Stats({ uid, refreshKey }: StatsProps) {
   const [chartType, setChartType] = useState<"line" | "bar" | "pie">("line");
@@ -54,25 +43,8 @@ export default function Stats({ uid, refreshKey }: StatsProps) {
         // Parse CSV data for each upload
         const uploadsWithData = uploadsList.map((upload) => {
           // Type guard to check if upload has csvData
-          if ('csvData' in upload) {
-            // Parse CSV data to extract rows
-            const csvLines = upload.csvData.split('\n').filter(line => line.trim());
-            const headers = csvLines[0]?.split(',') || [];
-            const rows = csvLines.slice(1).map(line => {
-              const values = line.split(',');
-              const row: Record<string, string> = {};
-              headers.forEach((header, i) => {
-                row[header.trim()] = values[i]?.trim() || '';
-              });
-              return row;
-            });
 
-            return {
-              ...upload,
-              data: rows,
-            } as UploadWithData;
-          }
-          return upload as UploadWithData;
+          return upload;
         });
 
         setUploads(uploadsWithData);
@@ -103,7 +75,7 @@ export default function Stats({ uid, refreshKey }: StatsProps) {
 
         const rows = Array.isArray(upload.data) ? upload.data : [];
         const totalSeconds = rows.reduce((sum, row) => {
-          const endedIso = row?.endedIso || row?.endedISO;
+          const endedIso = row?.endedIso;
           const durationSeconds = Number(row?.durationSeconds ?? 0);
           // Use endedIso date for the bucket
           const ended = endedIso ? new Date(endedIso) : uploadedAt;
@@ -113,7 +85,7 @@ export default function Stats({ uid, refreshKey }: StatsProps) {
 
         const endedDates = rows
           .map((row) => {
-            const endedIso = row?.endedIso || row?.endedISO;
+            const endedIso = row?.endedIso;
             return endedIso ? new Date(endedIso) : uploadedAt;
           })
           .filter((d): d is Date => !!d)
@@ -291,7 +263,7 @@ export default function Stats({ uid, refreshKey }: StatsProps) {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <h4 className="text-sm font-semibold text-[var(--text)] group-hover:text-blue-600 transition-colors truncate">
-                      {upload.filename ?? upload.fileName}
+                      {upload.filename}
                     </h4>
                     <span
                       className={`px-2 py-0.5 rounded-full text-xs font-medium shrink-0 ${

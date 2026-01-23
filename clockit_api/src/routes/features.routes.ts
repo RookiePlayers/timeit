@@ -4,6 +4,7 @@ import { authenticate } from '@/middleware/auth';
 import { defaultRateLimiter } from '@/middleware/rate-limit';
 import { asyncHandler } from '@/middleware/async-handler';
 import { validateBody, validateParams } from '@/middleware/validate';
+import { cache } from '@/middleware/cache';
 import { z } from 'zod';
 
 const router = Router();
@@ -21,6 +22,7 @@ const entitlementIdSchema = z.object({
 router.get(
   '/user',
   authenticate,
+  cache({ ttl: 300000 }), // Cache for 5 minutes (features change less frequently)
   defaultRateLimiter,
   asyncHandler(FeaturesController.getUserEntitlement)
 );

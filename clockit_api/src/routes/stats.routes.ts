@@ -4,7 +4,7 @@ import { authenticate } from '@/middleware/auth';
 import { defaultRateLimiter } from '@/middleware/rate-limit';
 import { asyncHandler } from '@/middleware/async-handler';
 import { validateBody } from '@/middleware/validate';
-import { clearCache } from '@/middleware/cache';
+import { cache, clearCache } from '@/middleware/cache';
 import { idempotent } from '@/middleware/idempotency';
 import { z } from 'zod';
 
@@ -21,6 +21,7 @@ const achievementSchema = z.object({
 router.get(
   '/',
   authenticate,
+  cache({ ttl: 60000 }), // Cache for 1 minute
   defaultRateLimiter,
   asyncHandler(StatsController.getStats)
 );

@@ -7,7 +7,18 @@
     "strict": true,
     "skipLibCheck": true,
     "outDir": "dist",
+    "rootDir": ".",
     "types": ["node"]
   },
-  "include": ["src"]
+  "include": [
+    "src/**/*",
+    "config/**/*",
+    "caching/**/*",
+    "controller/**/*",
+    "services/**/*",
+    "socket/**/*",
+    "validation/**/*",
+    "types.ts"
+  ],
+  "exclude": ["node_modules", "dist"]
 }

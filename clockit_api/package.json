@@ -6,7 +6,7 @@
   "scripts": {
     "check-env": "node check-env.js",
     "dev": "nodemon --exec ts-node -r tsconfig-paths/register --project tsconfig.dev.json src/server.ts",
-    "build": "tsc",
+    "build": "tsc && tsc-alias -p tsconfig.json",
     "start": "node dist/server.js",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -65,6 +65,7 @@
     "prettier": "^3.1.1",
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.16",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.3.3"
   },

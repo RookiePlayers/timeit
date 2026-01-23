@@ -10,9 +10,11 @@ const startServer = async () => {
 
     const app = createApp();
 
-    const server = app.listen(config.port, () => {
+    logger.info(`Starting server on port ${config.port}...`);
+    const server = app.listen(config.port, '0.0.0.0', () => {
       logger.info(`Server running on port ${config.port} in ${process.env.NODE_ENV} mode`);
       logger.info(`API available at ${config.apiBaseUrl}/api/v1`);
+      logger.info(`Listening on http://0.0.0.0:${config.port}`);
     });
 
     const gracefulShutdown = (signal: string) => {

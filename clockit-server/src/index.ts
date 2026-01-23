@@ -1,4 +1,6 @@
 import dotenv from "dotenv";
+// Load .env file if it exists (for local development)
+// In production (Cloud Run), environment variables are provided by the runtime
 dotenv.config({
   path: ".env"
 });
@@ -19,7 +21,13 @@ import { Cachier } from "../caching";
 
 
 const app = express();
-app.use(cors());
+
+// Configure CORS to allow WebSocket connections
+app.use(cors({
+  origin: true, // Allow all origins in development, configure for production
+  credentials: true,
+}));
+
 app.use(express.json());
 
 const server = http.createServer(app);
@@ -61,28 +69,36 @@ const handleConnection = (socket: WebSocket, req: http.IncomingMessage) => {
   const url = req.url ? new URL(req.url, "http://localhost") : null;
   const tokenFromQuery = url?.searchParams.get("token");
   const token = extractBearer(req) || tokenFromQuery;
+
+  // Helper function to set up connection after authentication
+  const setupConnection = (userId: string, isGuest: boolean = false) => {
+    console.info("[ws] connection established", { userId, isGuest });
+    WebsocketOrchestrator.getInstance().ensureUserMaps(userId);
+    orchestrator.getSocketsByUser().get(userId)!.add(socket);
+
+    console.info("[ws] sending ready snapshot", { userId, sessions: serializeSessions(userId).length });
+    socket.send(
+      JSON.stringify({
+        type: "ready",
+        payload: serializeSessions(userId),
+      }),
+    );
+    startListenersForSocket(socket, [], userId);
+  };
+
+  // If no token provided, allow as guest
   if (!token) {
-    console.warn("[ws] missing token, closing connection");
-    socket.close(4401, "Unauthorized");
+    const guestId = "guest_" + Date.now() + "_" + Math.random().toString(36).substring(2, 9);
+    console.info("[ws] guest connection", { guestId });
+    setupConnection(guestId, true);
     return;
   }
-  let userId = "anonymous" + Date.now();
+
+  // If token provided, verify it
   adminAuth()
     .verifyIdToken(token)
     .then((decoded) => {
-      userId = decoded.uid;
-      console.info("[ws] authenticated connection", { userId });
-      WebsocketOrchestrator.getInstance().ensureUserMaps(userId);
-      orchestrator.getSocketsByUser().get(userId)!.add(socket);
-
-      console.info("[ws] sending ready snapshot", { userId, sessions: serializeSessions(userId).length });
-      socket.send(
-        JSON.stringify({
-          type: "ready",
-          payload: serializeSessions(userId),
-        }),
-      );
-      startListenersForSocket(socket, [], userId);
+      setupConnection(decoded.uid, false);
     })
     .catch((err) => {
       console.warn("[ws] token verification failed", { reason: err instanceof Error ? err.message : "unknown" });
@@ -153,6 +169,26 @@ app.get("/", (_req, res) => {
 });
 
 const port = Number(process.env.PORT || 4000);
-server.listen(port, () => {
-  console.log(`[clockit-server] listening on http://localhost:${port}`);
+console.log(`[clockit-server] Starting server on port ${port}...`);
+console.log(`[clockit-server] Environment: NODE_ENV=${process.env.NODE_ENV}`);
+server.listen(port, '0.0.0.0', () => {
+  console.log(`[clockit-server] Successfully listening on http://0.0.0.0:${port}`);
+});
+
+server.on('error', (error: NodeJS.ErrnoException) => {
+  console.error('[clockit-server] Server error:', error);
+  if (error.code === 'EADDRINUSE') {
+    console.error(`[clockit-server] Port ${port} is already in use`);
+  }
+  process.exit(1);
+});
+
+process.on('uncaughtException', (error: Error) => {
+  console.error('[clockit-server] Uncaught exception:', error);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason: unknown) => {
+  console.error('[clockit-server] Unhandled rejection:', reason);
+  process.exit(1);
 });

@@ -7,25 +7,17 @@ on:
         required: true
         type: string
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - 'clockit_api/**'
-      - 'clockit-server/**'
-      - 'cloudbuild-api.yaml'
-      - 'cloudbuild-socket.yaml'
-      - '.github/workflows/deploy.yml'
-      - '.github/workflows/deploy-api.yml'
-      - '.github/workflows/deploy-socket.yml'
-
 jobs:
   deploy_api:
     name: Deploy API
     uses: ./.github/workflows/deploy-api.yml
+    with:
+      target-env: ${{ inputs.target-env }}
     secrets: inherit
 
   deploy_socket:
     name: Deploy Socket Server
     uses: ./.github/workflows/deploy-socket.yml
+    with:
+      target-env: ${{ inputs.target-env }}
     secrets: inherit

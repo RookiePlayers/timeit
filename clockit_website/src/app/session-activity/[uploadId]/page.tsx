@@ -6,9 +6,10 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/lib/firebase";
-import { uploadsApi } from "@/lib/api-client";
+import { isServerUnavailableError, uploadsApi } from "@/lib/api-client";
 import { Goal } from "@/types";
 import NavBar from "@/components/NavBar";
+import ServerUnavailable from "@/components/ServerUnavailable";
 
 type UploadRows = Array<Record<string, unknown>>;
 
@@ -24,7 +25,7 @@ export default function UploadDetailPage() {
   const [user, loadingUser, authError] = useAuthState(auth);
   const [upload, setUpload] = useState<UploadData | null>(null);
   const [loadingUpload, setLoadingUpload] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<Error | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState<{ title: string; entries: Array<{ label: string; seconds: number }> } | null>(null);
   const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
@@ -48,7 +49,7 @@ export default function UploadDetailPage() {
         const data = await uploadsApi.get(uploadId);
 
         if (!data) {
-          setLoadError("Upload not found.");
+          setLoadError(new Error("Upload not found."));
           setUpload(null);
           return;
         }
@@ -62,8 +63,8 @@ export default function UploadDetailPage() {
           rows,
         });
       } catch (err) {
-        const msg = err instanceof Error ? err.message : "Failed to load upload.";
-        setLoadError(msg);
+        const error = err instanceof Error ? err : new Error("Failed to load upload.");
+        setLoadError(error);
       } finally {
         setLoadingUpload(false);
       }
@@ -137,6 +138,10 @@ export default function UploadDetailPage() {
     );
   }
 
+  if (loadError && isServerUnavailableError(loadError)) {
+    return <ServerUnavailable />;
+  }
+
   const title = user.displayName || user.email || "Developer";
 
   return (
@@ -177,7 +182,7 @@ export default function UploadDetailPage() {
         <section className="bg-[var(--card)] border border-[var(--border)] rounded-2xl shadow-lg shadow-blue-900/10">
           <div className="px-4 py-3 border-b border-[var(--border)] flex items-center justify-between gap-3">
             <h2 className="text-lg font-semibold text-[var(--text)]">Rows</h2>
-            {loadError && <span className="text-sm text-red-500"> {loadError}</span>}
+            {loadError && <span className="text-sm text-red-500"> {loadError.message}</span>}
           </div>
           <div className="overflow-x-auto">
             <table className="min-w-[840px] w-full text-sm text-[var(--text)]">

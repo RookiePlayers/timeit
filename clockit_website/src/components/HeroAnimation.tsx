@@ -9,6 +9,7 @@ export default function HeroAnimation() {
   const [timer, setTimer] = useState("00:00:00");
 
   // Simulation sequence
+  const isStepZero = step === 0;
   useEffect(() => {
     const sequence = async () => {
       // Step 0: Idle
@@ -38,7 +39,7 @@ export default function HeroAnimation() {
     };
 
     sequence();
-  }, [step === 0]); // Restart when step hits 0 again
+  }, [isStepZero]); // Restart when step hits 0 again
 
   return (
     <div className="relative w-full max-w-lg mx-auto h-64 bg-gray-900 rounded-xl shadow-2xl overflow-hidden border border-gray-800 font-mono text-sm">
@@ -74,7 +75,7 @@ export default function HeroAnimation() {
             animate={{ opacity: step >= 1 ? 1 : 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            &nbsp;&nbsp;<span className="text-blue-300">console</span>.<span className="text-yellow-300">log</span>(<span className="text-green-300">"Coding..."</span>);
+            &nbsp;&nbsp;<span className="text-blue-300">console</span>.<span className="text-yellow-300">log</span>(<span className="text-green-300">&quot;Coding...&quot;</span>);
           </motion.div>
         </div>
         <div className="flex">
@@ -84,7 +85,7 @@ export default function HeroAnimation() {
             animate={{ opacity: step >= 1 ? 1 : 0 }}
             transition={{ duration: 0.5, delay: 0.5 }}
           >
-             &nbsp;&nbsp;<span className="text-gray-500">// Clockit is tracking this...</span>
+            &nbsp;&nbsp;<span className="text-gray-500">Clockit is tracking this...</span>
           </motion.div>
         </div>
         <div className="flex">
@@ -101,7 +102,7 @@ export default function HeroAnimation() {
             <span>main*</span>
           </div>
           <div className="flex items-center gap-1">
-             <span>0 errors</span>
+          <span>0 errors</span>
           </div>
         </div>
         

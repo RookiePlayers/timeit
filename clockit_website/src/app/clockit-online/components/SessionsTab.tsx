@@ -523,9 +523,21 @@ export default function SessionsTab({
           Start multiple sessions, attach goals, and track your performance in real-time
         </p>
         {!user && (
-          <p className="text-xs text-amber-200">
-            You are not signed in. Sessions are stored in your browser (localStorage/cookies) until you sign in.
-          </p>
+          <div className="inline-flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-amber-800 text-sm font-semibold">
+            <span className="mt-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full bg-amber-200 text-amber-900 text-[10px]">
+              !
+            </span>
+            <div className="space-y-2">
+              <p>
+                You are not signed in. Sessions are stored in your browser (localStorage/cookies) until you sign in.
+              </p>
+              <ul className="list-disc pl-5 text-xs font-medium text-amber-700 space-y-1">
+                <li>Sign in to create goals</li>
+                <li>Access performance stats</li>
+                <li>And more features as they unlock</li>
+              </ul>
+            </div>
+          </div>
         )}
       </div>
 
@@ -536,12 +548,12 @@ export default function SessionsTab({
         >
           <IconPlayerPlayFilled size={16} /> Start empty session
         </button>
-        <button
+       {goalsEnabled && <button
           onClick={() => setActiveTab("goals")}
           className="inline-flex items-center gap-2 px-4 py-2 border border-[var(--border)] text-[var(--muted)] rounded-lg hover:text-[var(--text)]"
         >
           <IconArrowRight size={16} /> Jump to goals
-        </button>
+        </button>}
       </div>
 
 

@@ -7,10 +7,11 @@ import { auth } from "@/lib/firebase";
 import { useSnackbar } from "notistack";
 import { useRouter } from "next/navigation";
 import NavBar from "@/components/NavBar";
-import { uploadsApi, type UploadListItem } from "@/lib/api-client";
+import { isServerUnavailableError, UploadResponse, uploadsApi } from "@/lib/api-client";
 import { UploadRow } from "@/types";
 import useFeature from "@/hooks/useFeature";
 import { buildNavLinks, isFeatureEnabledForNav } from "@/utils/navigation";
+import ServerUnavailable from "@/components/ServerUnavailable";
 
 
 export default function RecentActivityPage() {
@@ -22,7 +23,7 @@ export default function RecentActivityPage() {
   const pageSize = 20;
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const { enqueueSnackbar } = useSnackbar();
-  const [uploads, setUploads] = useState<UploadListItem[]>([]);
+  const [uploads, setUploads] = useState<UploadResponse[]>([]);
   const [loadingUploads, setLoadingUploads] = useState(false);
   const [uploadsError, setUploadsError] = useState<Error | null>(null);
 
@@ -52,7 +53,7 @@ export default function RecentActivityPage() {
         setLoadingUploads(true);
         setUploadsError(null);
         const data = await uploadsApi.list(100, false);
-        setUploads(data as UploadListItem[]);
+        setUploads(data);
       } catch (err) {
         setUploadsError(err instanceof Error ? err : new Error('Failed to load uploads'));
       } finally {
@@ -123,6 +124,10 @@ export default function RecentActivityPage() {
         </div>
       </div>
     );
+  }
+
+  if (uploadsError && isServerUnavailableError(uploadsError)) {
+    return <ServerUnavailable />;
   }
 
   const rows: UploadRow[] = uploads.map((upload) => {

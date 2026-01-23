@@ -3,55 +3,20 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/lib/firebase";
-import { statsApi } from "@/lib/api-client";
+import { isServerUnavailableError, statsApi } from "@/lib/api-client";
 import Link from "next/link";
 import UploadCSV from "@/components/UploadCSV";
 import Stats from "@/components/Stats";
-import Image from "next/image";
 import { IconCode, IconHourglassEmpty, IconSum, IconTimeDuration0 } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import NavBar from "@/components/NavBar";
 import useFeature from "@/hooks/useFeature";
 import { buildNavLinks, isFeatureEnabledForNav } from "@/utils/navigation";
-import {
-  Legend,
-  PolarAngleAxis,
-  PolarGrid,
-  PolarRadiusAxis,
-  Radar,
-  RadarChart,
-  ResponsiveContainer,
-  Tooltip,
-} from "recharts";
 import FocusRadars from "@/components/FocusRadars";
 import RefreshAggregates from "@/components/RefreshAggregates";
-import { metricAverage, metricSum } from "@/hooks/useFetchAggregates";
-
-type Range = "week" | "month" | "year" | "all";
-
-type MetricStats = {
-  sum: number;
-  avg: number;
-  min: number;
-  max: number;
-};
-
-type MetricValue = number | MetricStats;
-
-type AggregateEntry = {
-  periodStart: string;
-  totalSeconds: MetricValue;
-  idleSeconds: MetricValue;
-  workingSeconds: MetricValue;
-  languageSeconds?: Record<string, MetricValue>;
-  topWorkspaces?: Array<{ workspace: string; seconds: MetricValue }>;
-  workspaceSeconds?: Record<string, MetricValue>;
-  productivityScore?: number;
-  productivityPercent: number;
-  topLanguage?: { language: string; seconds: MetricValue } | null;
-};
-
-type Aggregates = Partial<Record<Range, AggregateEntry[]>>;
+import { metricSum } from "@/hooks/useFetchAggregates";
+import { AggregateEntry, Aggregates, MetricValue, Range } from "@/types";
+import ServerUnavailable from "@/components/ServerUnavailable";
 
 const rangeLabels: Record<Range, string> = {
   week: "This week",
@@ -60,14 +25,21 @@ const rangeLabels: Record<Range, string> = {
   all: "All time",
 };
 
+// Helper to convert Firestore timestamp to number
+function toTimestamp(value: number | { _seconds: number; _nanoseconds: number } | null | undefined): number | null {
+  if (!value) return null;
+  if (typeof value === 'number') return value;
+  return value._seconds * 1000;
+}
+
 export default function DashboardPage() {
   const [user, loadingUser, authError] = useAuthState(auth);
   const { isFeatureEnabled } = useFeature();
   const [range, setRange] = useState<Range>("week");
-  const [focusRange, setFocusRange] = useState<Range>("week");
+  const [, setFocusRange] = useState<Range>("week");
   const [aggregates, setAggregates] = useState<Aggregates | null>(null);
   const [isLoadingStats, setIsLoadingStats] = useState(true);
-  const [statsError, setStatsError] = useState<string | null>(null);
+  const [statsError, setStatsError] = useState<Error | null>(null);
   const router = useRouter();
   const [lastRefresh, setLastRefresh] = useState<number | null>(null);
   const [lastUpdated, setLastUpdated] = useState<number | null>(null);
@@ -92,29 +64,30 @@ export default function DashboardPage() {
       try {
         const data = await statsApi.get() as {
           aggregates?: Aggregates;
-          lastRefreshRequested?: number;
-          lastAggregatedAt?: number;
-          updatedAt?: number;
+          lastRefreshRequested?: number | { _seconds: number; _nanoseconds: number };
+          lastAggregatedAt?: number | { _seconds: number; _nanoseconds: number };
+          updatedAt?: number | { _seconds: number; _nanoseconds: number };
         };
 
         if (!data) {
           setAggregates(null);
-          setStatsError("No aggregated stats found yet.");
+          setStatsError(new Error("No aggregated stats found yet."));
           return;
         }
 
         setAggregates(data.aggregates || null);
-        const ts = data.lastRefreshRequested;
-        if (typeof ts === "number" && Number.isFinite(ts)) {
-          setLastRefresh(ts);
-        }
-        const aggregateTs = data.lastAggregatedAt;
-        const updatedTs = data.updatedAt;
+
+        // Convert timestamps from Firestore format to milliseconds
+        const ts = toTimestamp(data.lastRefreshRequested);
+        setLastRefresh(ts);
+
+        const aggregateTs = toTimestamp(data.lastAggregatedAt);
+        const updatedTs = toTimestamp(data.updatedAt);
         const chosen = aggregateTs || updatedTs || ts || null;
         setLastUpdated(chosen);
       } catch (err) {
-        const msg = err instanceof Error ? err.message : "Failed to load stats";
-        setStatsError(msg);
+        const error = err instanceof Error ? err : new Error("Failed to load stats");
+        setStatsError(error);
       } finally {
         setIsLoadingStats(false);
       }
@@ -124,11 +97,22 @@ export default function DashboardPage() {
   }, [user]);
 
   const active = useMemo(() => {
-    const list = aggregates?.[range];
-    console.log("Aggregates for range", range, list);
-    if (!list || list.length === 0) return undefined;
-    const sorted = [...list].sort((a, b) => (a.periodStart > b.periodStart ? -1 : 1));
-    return sorted[0];
+    if (!aggregates) {return undefined;}
+    const pickLatest = (list: AggregateEntry[] | undefined) => {
+      if (!list || list.length === 0) {return undefined;}
+      return [...list].sort((a, b) => (a.periodStart > b.periodStart ? -1 : 1))[0];
+    };
+    switch (range) {
+      case "week":
+        return aggregates.thisWeek ? aggregates.thisWeek : null;
+      case "month":
+        return aggregates.thisMonth ? aggregates.thisMonth : null;
+      case "year":
+        return aggregates.thisYear ? aggregates.thisYear : null;
+      case "all":
+      default:
+        return pickLatest(aggregates.all);
+    }
   }, [aggregates, range]);
 
 
@@ -203,8 +187,12 @@ export default function DashboardPage() {
     );
   }
 
-  const title = user.displayName || user.email || "Developer";
+  if (statsError && isServerUnavailableError(statsError)) {
+    return <ServerUnavailable />;
+  }
 
+  const title = user.displayName || user.email || "Developer";
+console.log('Rendering dashboard for user:', lastUpdated);
   return (
     <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
       <NavBar
@@ -252,7 +240,7 @@ export default function DashboardPage() {
 
         {isFeatureEnabled('dashboard-productivity-at-a-glance') && (
           <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="border border-[var(--border)] bg-[var(--card)] rounded-2xl shadow-lg shadow-blue-900/10 p-6 rounded-2xl">
+          <div className="border border-[var(--border)] bg-[var(--card)] shadow-lg shadow-blue-900/10 p-6 rounded-2xl">
             <h2 className="text-lg font-semibold text-[var(--text)] mb-4">Total time</h2>
             {active ? (
               <div className="space-y-3">
@@ -261,7 +249,7 @@ export default function DashboardPage() {
                 <MetricRow icon={<IconHourglassEmpty />} label="Idle time" value={formatDuration(active.idleSeconds)} />
               </div>
             ) : (
-              <p className="text-sm text-[var(--muted)]">{statsError || "No data available."}</p>
+              <p className="text-sm text-[var(--muted)]">{statsError?.message || "No data available."}</p>
             )}
           </div>
 
@@ -279,11 +267,11 @@ export default function DashboardPage() {
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-[var(--muted)]">{statsError || "No language data available."}</p>
+              <p className="text-sm text-[var(--muted)]">{statsError?.message || "No language data available."}</p>
             )}
           </div>
 
-          <div className=" border border-[var(--border)] bg-[var(--card)] rounded-2xl card-clean shadow-lg shadow-blue-900/10 p-6 rounded-2xl">
+          <div className=" border border-[var(--border)] bg-[var(--card)] card-clean shadow-lg shadow-blue-900/10 p-6 rounded-2xl">
             <h2 className="text-lg font-semibold text-[var(--text)] mb-1">Productivity score</h2>
             <div className="relative group inline-block mb-2">
               <span className="text-sm text-[var(--muted)] cursor-pointer underline decoration-dotted">
@@ -309,14 +297,14 @@ export default function DashboardPage() {
                 </p>
               </div>
             ) : (
-              <p className="text-sm text-[var(--muted)]">{statsError || "No productivity data available."}</p>
+              <p className="text-sm text-[var(--muted)]">{statsError?.message || "No productivity data available."}</p>
             )}
           </div>
 
           <div className=" border border-[var(--border)] bg-[var(--card)] card-clean shadow-lg shadow-blue-900/10 p-6 rounded-2xl">
             <h2 className="text-lg font-semibold text-[var(--text)] mb-4">Top workspaces</h2>
             {topWorkspaces.length === 0 ? (
-              <p className="text-sm text-[var(--muted)]">{statsError || "No workspace data available."}</p>
+              <p className="text-sm text-[var(--muted)]">{statsError?.message || "No workspace data available."}</p>
             ) : (
               <div className="space-y-2">
                 {topWorkspaces.map((ws, idx) => (
@@ -337,7 +325,7 @@ export default function DashboardPage() {
         )}
 
         {isFeatureEnabled('dashboard-focus-radars') && (
-          <div className=" border border-[var(--border)] bg-[var(--card)] rounded-2xl card-clean shadow-lg shadow-blue-900/10 p-6 rounded-2xl">
+          <div className=" border border-[var(--border)] bg-[var(--card)]  card-clean shadow-lg shadow-blue-900/10 p-6 rounded-2xl">
             <FocusRadars />
           </div>
         )}
@@ -346,7 +334,7 @@ export default function DashboardPage() {
           <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {isFeatureEnabled('recent-activity') && (
               <div
-              className="lg:col-span-2  border border-[var(--border)] bg-[var(--card)] rounded-2xl card-clean shadow-lg shadow-blue-900/10 p-6 rounded-2xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/30"
+              className="lg:col-span-2  border border-[var(--border)] bg-[var(--card)] rounded-2xl card-clean shadow-lg shadow-blue-900/10 p-6 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/30"
               role="button"
               tabIndex={0}
               onClick={handleRecentCardClick}
@@ -373,7 +361,7 @@ export default function DashboardPage() {
               </div>
             )}
             {isFeatureEnabled('upload-csv-data') && (
-              <div className=" border border-[var(--border)] bg-[var(--card)] rounded-2xl card-clean shadow-lg shadow-blue-900/10 p-6 rounded-2xl">
+              <div className=" border border-[var(--border)] bg-[var(--card)] card-clean shadow-lg shadow-blue-900/10 p-6 rounded-2xl">
                 <h2 className="text-lg font-semibold text-[var(--text)] mb-4">Upload CSV</h2>
                 <UploadCSV
                   onUploadComplete={() => {
@@ -406,70 +394,6 @@ function MetricRow({
         <p className="text-sm text-[var(--muted)]">{label}</p>
       </div>
       <p className="text-base font-semibold text-[var(--text)]">{value}</p>
-    </div>
-  );
-}
-
-function RadarPanel({
-  title,
-  emptyLabel,
-  data,
-  color,
-  chartKey,
-}: {
-  title: string;
-  emptyLabel: string;
-  data: Array<{ label: string; hours: number }>;
-  color: string;
-  chartKey?: string;
-}) {
-  const hasData = data.length > 0;
-  return (
-    <div className=" border border-[var(--border)] bg-[var(--card)] rounded-2xl card-clean shadow-lg shadow-blue-900/10 p-4 rounded-2xl">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-base font-semibold text-[var(--text)]">{title}</h3>
-        {hasData && <span className="text-xs text-[var(--muted)]">{data.length} entries</span>}
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-center">
-        <div className="lg:col-span-2 h-[260px]">
-          {!hasData ? (
-            <div className="h-full flex items-center justify-center text-sm text-[var(--muted)]">{emptyLabel}</div>
-          ) : (
-            <ResponsiveContainer width="100%" height="100%">
-              <RadarChart data={data} key={chartKey}>
-                <PolarGrid />
-                <PolarAngleAxis dataKey="label" />
-                <PolarRadiusAxis angle={45} />
-                <Radar name="Hours" dataKey="hours" stroke={color} fill={color} fillOpacity={0.4} />
-                <Legend verticalAlign="middle" align="left" layout="vertical" />
-                <Tooltip />
-              </RadarChart>
-            </ResponsiveContainer>
-          )}
-        </div>
-        <div className="space-y-2">
-          {!hasData ? (
-            <p className="text-sm text-[var(--muted)]">{emptyLabel}</p>
-          ) : (
-            data.slice(0, 6).map((row, idx) => (
-              <div
-                key={row.label}
-                className="flex items-center justify-between px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card-soft)]"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="w-7 h-7 rounded-full bg-[var(--card)] border border-[var(--border)] flex items-center justify-center text-xs font-semibold" style={{ color }}>
-                    {idx + 1}
-                  </span>
-                  <div>
-                    <p className="text-sm font-semibold text-[var(--text)]">{row.label}</p>
-                    <p className="text-xs text-[var(--muted)]">{row.hours.toFixed(2)} hours</p>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
     </div>
   );
 }

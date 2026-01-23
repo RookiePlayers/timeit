@@ -48,7 +48,7 @@ function AuthContent() {
       url: process.env.NEXT_PUBLIC_FIREBASE_REDIRECT_URL || `${origin}/auth`,
       handleCodeInApp: true,
     };
-  }, [router]);
+  }, []);
 
   useEffect(() => {
     const requestedMode = searchParams?.get("mode");
@@ -97,6 +97,7 @@ function AuthContent() {
     };
 
     void completeEmailLinkSignIn();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleEmailPassword = async () => {

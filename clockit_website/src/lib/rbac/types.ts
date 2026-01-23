@@ -44,7 +44,7 @@ export enum Role {
 export interface Permission {
   action: Action;
   subject: Subject;
-  conditions?: Record<string, any>;
+  conditions?: Record<string, unknown>;
   fields?: string[];
   inverted?: boolean;
   reason?: string;
@@ -55,7 +55,7 @@ export interface UserWithRole {
   uid: string;
   email?: string | null;
   role: Role;
-  customClaims?: Record<string, any>;
+  customClaims?: Record<string, unknown>;
   teamId?: string;
   permissions?: Permission[];
 }

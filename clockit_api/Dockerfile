@@ -10,10 +10,10 @@ COPY package*.json ./
 # Install dependencies (include dev for build)
 RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
-# Copy source code
+# Copy source code and tsconfig
 COPY . .
 
-# Build TypeScript
+# Build TypeScript (this will also run tsc-alias via the build script)
 RUN npm run build
 
 # Runtime stage
@@ -31,8 +31,9 @@ RUN if [ -f package-lock.json ]; then npm ci --omit=dev; else npm install --omit
 # Copy build output
 COPY --from=build /app/dist ./dist
 
-# Expose port 
-EXPOSE 3001
+# Cloud Run expects PORT=8080
+ENV PORT=8080
+EXPOSE 8080
 
 # Start the server
 CMD ["npm", "start"]

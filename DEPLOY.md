@@ -99,10 +99,16 @@ gcloud run services describe clockit-socket \
 
 #### For clockit-api:
 
+**CRITICAL**: You must set the `API_BASE_URL` to your actual Cloud Run URL (not localhost) and include your production domain in `ALLOWED_ORIGINS`.
+
 ```bash
+# First, get your Cloud Run URL
+API_URL=$(gcloud run services describe clockit-api --region us-central1 --format 'value(status.url)')
+
+# Then update environment variables
 gcloud run services update clockit-api \
   --region us-central1 \
-  --set-env-vars="FIREBASE_PROJECT_ID=your-project-id,FIREBASE_CLIENT_EMAIL=your-email,NODE_ENV=production,ALLOWED_ORIGINS=https://your-firebase-app.web.app"
+  --set-env-vars="NODE_ENV=production,API_BASE_URL=${API_URL},ALLOWED_ORIGINS=https://clockit.octech.dev,https://your-firebase-app.web.app,FIREBASE_SERVICE_ACCOUNT_B64=your-base64-encoded-service-account"
 ```
 
 Or use Secret Manager for sensitive data:
@@ -392,6 +398,56 @@ Update `ALLOWED_ORIGINS` environment variable:
 gcloud run services update clockit-api \
   --region us-central1 \
   --update-env-vars="ALLOWED_ORIGINS=https://your-firebase-app.web.app,https://your-custom-domain.com"
+```
+
+### 500 Internal Server Errors
+
+If you see 500 errors in Cloud Run logs, check these common issues:
+
+#### 1. Express Rate Limit ValidationError
+
+**Symptom**: Logs show `ValidationError: The 'X-Forwarded-For' header is set but the Express 'trust proxy' setting is false`
+
+**Solution**: The code now includes `app.set('trust proxy', true)` in [app.ts:18](clockit_api/src/app.ts#L18). This is required for Cloud Run since it acts as a reverse proxy.
+
+#### 2. CORS Configuration Issues
+
+**Symptom**: Logs show `Not allowed by CORS` errors for OPTIONS requests
+
+**Solution**:
+
+1. Make sure `https://clockit.octech.dev` is in your `ALLOWED_ORIGINS`:
+
+   ```bash
+   gcloud run services update clockit-api \
+     --region europe-west4 \
+     --update-env-vars="ALLOWED_ORIGINS=https://clockit.octech.dev"
+   ```
+
+2. The code now handles trailing slashes automatically in [app.ts:24-47](clockit_api/src/app.ts#L24-L47)
+
+#### 3. Incorrect API_BASE_URL
+
+**Symptom**: API_BASE_URL is set to `http://localhost:8080` in production
+
+**Solution**: Update to your actual Cloud Run URL:
+
+```bash
+# Get your Cloud Run URL
+API_URL=$(gcloud run services describe clockit-api --region europe-west4 --format 'value(status.url)')
+
+# Update the environment variable
+gcloud run services update clockit-api \
+  --region europe-west4 \
+  --update-env-vars="API_BASE_URL=${API_URL}"
+```
+
+**Example**:
+
+```bash
+gcloud run services update clockit-api \
+  --region europe-west4 \
+  --update-env-vars="API_BASE_URL=https://clockit-api-ie4o3wu3ta-ez.a.run.app"
 ```
 
 ---

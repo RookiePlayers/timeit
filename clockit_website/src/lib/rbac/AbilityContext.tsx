@@ -9,7 +9,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '@/lib/firebase';
 import { defineAbilityFor, type AppAbility } from './abilities';
-import { Role } from './types';
+import { Permission, Role } from './types';
 
 interface AbilityContextValue {
   ability: AppAbility;
@@ -41,7 +41,7 @@ export function AbilityProvider({ children }: AbilityProviderProps) {
         // Get custom claims from Firebase
         const idTokenResult = await user.getIdTokenResult();
         const userRole = (idTokenResult.claims.role as Role) || Role.USER;
-        const customPermissions = idTokenResult.claims.permissions as any[];
+        const customPermissions = idTokenResult.claims.permissions as Permission[];
 
         setRole(userRole);
         setAbility(defineAbilityFor(userRole, customPermissions));

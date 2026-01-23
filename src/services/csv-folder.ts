@@ -1,3 +1,5 @@
+import { configTargetForKey } from '../core/config-target';
+
 export class CsvFolderService {
    private static instance: CsvFolderService;
    private constructor(private vscode: typeof import('vscode'), private notify: (message: string, type: 'info' | 'warn' | 'error') => void) {}
@@ -7,7 +9,7 @@ export class CsvFolderService {
     }
     return CsvFolderService.instance;
   }
-  
+
   async showCsvMenu() {
     const cfg = this.vscode.workspace.getConfiguration();
     const name = (cfg.get<string>('clockit.author.name') || '').trim();
@@ -187,7 +189,7 @@ async  chooseCsvFolder() {
 
   const folderUri = selection[0];
   const cfg = this.vscode.workspace.getConfiguration();
-  await cfg.update('clockit.csv.outputDirectory', folderUri.fsPath, this.vscode.ConfigurationTarget.Workspace);
+  await cfg.update('clockit.csv.outputDirectory', folderUri.fsPath, configTargetForKey('clockit.csv.outputDirectory'));
 
   const ensure = cfg.get<boolean>('clockit.csv.ensureDirectory') ?? true;
   if (ensure) {

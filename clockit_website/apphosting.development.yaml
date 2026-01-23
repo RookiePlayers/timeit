@@ -44,13 +44,3 @@ env:
     availability:
       - BUILD
       - RUNTIME
-  - variable: NEXT_PUBLIC_API_URL
-    value: https://clockit-api-ie4o3wu3ta-ez.a.run.app/api/v1
-    availability:
-      - BUILD
-      - RUNTIME
-  - variable: NEXT_PUBLIC_SOCKET_URL
-    value: wss://clockit-socket-ie4o3wu3ta-ez.a.run.app/session
-    availability:
-      - BUILD
-      - RUNTIME

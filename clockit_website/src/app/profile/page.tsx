@@ -28,7 +28,6 @@ export default function ProfilePage() {
   const [newToken, setNewToken] = useState<string | null>(null);
   const [tokenMessage, setTokenMessage] = useState<string | null>(null);
   const [loadingTokens, setLoadingTokens] = useState(false);
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (user?.displayName) {
@@ -133,7 +132,6 @@ export default function ProfilePage() {
     if (!user) {return;}
     setTokenMessage(null);
     setNewToken(null);
-    setCopied(false);
 
     try {
       const response = await tokensApi.create({
@@ -186,7 +184,7 @@ export default function ProfilePage() {
           { href: "/recent-activity", label: "Recent Activity" },
           { href: "/session-activity", label: "Session Activity" },
           { href: "/docs", label: "Docs" },
-
+          
         ]}
       />
 
@@ -292,20 +290,16 @@ export default function ProfilePage() {
             {tokenMessage && <p className="text-sm text-[var(--muted)]">{tokenMessage}</p>}
           </div>
           {newToken && (
-            <div className="border border-[var(--primary)] bg-primary-20 rounded-lg p-3 text-sm">
-              <p className="font-semibold mb-1 text-[var(--text)]">Copy your token now:</p>
+            <div className="border border-[var(--primary)] bg-[var(--primary)] text-[var(--primary-contrast)] rounded-lg p-3 text-sm">
+              <p className="font-semibold mb-1">Copy your token now:</p>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <code className="text-xs break-all w-full text-[var(--text)]">{newToken}</code>
+                <code className="text-xs break-all w-full">{newToken}</code>
                 <div className="flex justify-end">
                   <button
-                    onClick={() => {
-                      void navigator.clipboard.writeText(newToken);
-                      setCopied(true);
-                      setTimeout(() => setCopied(false), 1000);
-                    }}
-                    className="px-3 py-1 text-xs font-semibold text-[var(--primary-contrast)] bg-[var(--primary)] rounded-md hover:opacity-90 min-w-[60px]"
+                    onClick={() => navigator.clipboard.writeText(newToken)}
+                    className="px-3 py-1 text-xs font-semibold text-[var(--primary-contrast)] bg-[var(--primary)] rounded-md hover:bg-[var(--primary-dark)]"
                   >
-                    {copied ? "✓" : "Copy"}
+                    Copy
                   </button>
                 </div>
               </div>
