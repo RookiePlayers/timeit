@@ -44,7 +44,6 @@ export function useFetchAggregates(userId: string | null | undefined) {
                 lastRefresh: typeof ts === "number" && Number.isFinite(ts) ? ts : null,
             });
         } catch (err) {
-            const msg = err instanceof Error ? err.message : "Failed to load stats";
             const error = err instanceof Error ? err : new Error("Failed to load stats");
             setState((prev) => ({ ...prev, isLoading: false, error, message: null }));
         }
