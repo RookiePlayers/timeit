@@ -1,6 +1,7 @@
 // src/core/prompts.ts
 import * as vscode from 'vscode';
 import { FieldSpec } from './sink';
+import { configTargetForKey } from './config-target';
 import { Cache, TTL } from './cache/cache';
 import { CachedFetcher } from './cache/cache.fetcher';
 
@@ -80,11 +81,13 @@ export class PromptService {
       return;
     }
     if (spec.settingKey) {
-      await vscode.workspace.getConfiguration().update(spec.settingKey, value, vscode.ConfigurationTarget.Workspace);
+      const target = configTargetForKey(spec.settingKey);
+      await vscode.workspace.getConfiguration().update(spec.settingKey, value, target);
       return;
     }
     if (spec.implicitSetting) {
-      await vscode.workspace.getConfiguration().update(spec.key, value, vscode.ConfigurationTarget.Workspace);
+      const target = configTargetForKey(spec.key);
+      await vscode.workspace.getConfiguration().update(spec.key, value, target);
       return;
     }
     // else: memory only

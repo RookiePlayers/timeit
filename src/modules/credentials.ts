@@ -5,6 +5,7 @@ import { CsvSink } from '../sinks/csv.sink';
 import { JiraSink } from '../sinks/jira.sink';
 import { NotionSink } from '../sinks/notion.sink';
 import { globalSecretStore } from '../core/secret-store';
+import { configTargetForKey } from '../core/config-target';
 
 export function registerCredentialCommands(ctx: vscode.ExtensionContext) {
   ctx.subscriptions.push(
@@ -124,7 +125,7 @@ async function persistValue(
     return;
   }
   const k = spec.settingKey || spec.key;
-  await cfg.update(k, value, vscode.ConfigurationTarget.Workspace);
+  await cfg.update(k, value, configTargetForKey(k));
 }
 
 async function deleteValue(
@@ -138,7 +139,7 @@ async function deleteValue(
     return;
   }
   const k = spec.settingKey || spec.key;
-  await cfg.update(k, undefined, vscode.ConfigurationTarget.Workspace);
+  await cfg.update(k, undefined, configTargetForKey(k));
 }
 
 async function clearAllSecrets(secrets: { keys(): Promise<string[]>; delete(k: string): Promise<void> }) {
@@ -152,7 +153,7 @@ async function clearKnownSettings(cfg: vscode.WorkspaceConfiguration) {
     'clockit.notion.databaseId', 'clockit.notion.pageId',
     'clockit.enabledSinks'
   ];
-  await Promise.all(keys.map(k => cfg.update(k, undefined, vscode.ConfigurationTarget.Workspace)));
+  await Promise.all(keys.map(k => cfg.update(k, undefined, configTargetForKey(k))));
 }
 
 async function promptFieldEdit(spec: FieldSpec, existing: unknown): Promise<unknown> {

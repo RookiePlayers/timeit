@@ -144,21 +144,31 @@ export class BackupManager {
   }
 
   private resolveBaseDir(): string {
-    // Priority: explicit backup.directory → csvDirFallback → workspace root → cwd
+    // Priority: explicit backup.directory → csvDirFallback → workspace/.clockit → cwd/.clockit
     const explicit = (this.opts.directory || '').trim();
-    const fallback = (this.opts.csvDirFallback || '').trim();
     const ws = vscode?.workspace?.workspaceFolders?.[0]?.uri.fsPath;
 
-    // If a file-looking path was provided (e.g., "backup_timelog.csv"), treat its dirname as the target folder.
-    const candidate = explicit || fallback || ws || process.cwd();
-    const looksLikeFile = /\.[^/\\]+$/.test(candidate);
-    const dir = looksLikeFile ? path.dirname(candidate) : candidate;
+    // If explicit directory is provided, use it
+    if (explicit) {
+      // If a file-looking path was provided (e.g., "backup_timelog.csv"), treat its dirname as the target folder.
+      const looksLikeFile = /\.[^/\\]+$/.test(explicit);
+      const dir = looksLikeFile ? path.dirname(explicit) : explicit;
 
-    // Resolve relative paths against the workspace root when available.
-    if (!path.isAbsolute(dir)) {
-      return path.join(ws ?? process.cwd(), dir);
+      // Resolve relative paths against the workspace root when available.
+      if (!path.isAbsolute(dir)) {
+        return path.join(ws ?? process.cwd(), dir);
+      }
+      return dir;
     }
-    return dir;
+
+    // If no explicit directory but csvDirFallback is provided, use it
+    if (this.opts.csvDirFallback) {
+      return this.opts.csvDirFallback;
+    }
+
+    // Default fallback: workspace/.clockit or cwd/.clockit
+    const defaultRoot = ws ?? process.cwd();
+    return path.join(defaultRoot, '.clockit');
   }
 
   private async ensureDir(dir: string) {
@@ -186,6 +196,9 @@ export class BackupManager {
 
       const content = await fs.readFile(gitignore, 'utf8');
       const lines = content.split(/\r?\n/);
+      if (dirRel === '.clockit' && !lines.some((line) => line.trim() === '/.clockit/')) {
+        lines.push('/.clockit/');
+      }
       if (lines.some((line) => line.trim() === pattern)) { return; }
       lines.push(pattern);
       await fs.writeFile(gitignore, lines.join('\n'), 'utf8');

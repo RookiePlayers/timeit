@@ -10,7 +10,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/lib/firebase";
-import { statsApi } from "@/lib/api-client";
+import { isServerUnavailableError, statsApi } from "@/lib/api-client";
 import NavBar from "@/components/NavBar";
 import useFeature from "@/hooks/useFeature";
 import { useRouter } from "next/navigation";
@@ -29,11 +29,12 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { AggregateEntry, Aggregates, ChartView, Grade, MetricValue, Range, rangeLabels } from "@/types";
+import { AggregateEntry, Aggregates, ChartView, getAggregatesForRange, Grade, MetricValue, Range, rangeLabels } from "@/types";
 import FocusRadars from "@/components/FocusRadars";
 import { metricAverage, toHours } from "@/hooks/useFetchAggregates";
 import RefreshAggregates from "@/components/RefreshAggregates";
 import RangeTotals from "@/components/RangeTotals";
+import ServerUnavailable from "@/components/ServerUnavailable";
 
 export const chartViews: Array<{ key: ChartView; label: string }> = [
   { key: "stackedArea", label: "Stacked area" },
@@ -49,7 +50,7 @@ export default function AdvancedStatsPage() {
   const [chartView, setChartView] = useState<ChartView>("stackedArea");
   const [aggregates, setAggregates] = useState<Aggregates | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [statsError, setStatsError] = useState<string | null>(null);
+  const [statsError, setStatsError] = useState<Error | null>(null);
   const [lastRefresh, setLastRefresh] = useState<number | null>(null);
   const COOLDOWN_MS = 60 * 60 * 1000; // 1 hour
   const lastSavedBadgesRef = useRef<string | null>(null);
@@ -88,8 +89,8 @@ export default function AdvancedStatsPage() {
           setLastRefresh(ts);
         }
       } catch (err) {
-        const msg = err instanceof Error ? err.message : "Failed to load stats";
-        setStatsError(msg);
+        const error = err instanceof Error ? err : new Error("Failed to load stats");
+        setStatsError(error);
       } finally {
         setIsLoading(false);
       }
@@ -99,7 +100,7 @@ export default function AdvancedStatsPage() {
   }, [user]);
 
   const trendData = useMemo(() => {
-    const list = aggregates?.[range] ?? [];
+    const list = getAggregatesForRange(aggregates, range);
     return [...list]
       .sort((a, b) => new Date(a.periodStart).getTime() - new Date(b.periodStart).getTime())
       .map((entry) => ({
@@ -182,6 +183,10 @@ export default function AdvancedStatsPage() {
         </div>
       </div>
     );
+  }
+
+  if (statsError && isServerUnavailableError(statsError)) {
+    return <ServerUnavailable />;
   }
 
   if (!hasStatsAccess) {
@@ -279,7 +284,7 @@ export default function AdvancedStatsPage() {
           <div className="h-[320px]">
             {trendData.length === 0 ? (
               <div className="h-full flex items-center justify-center text-sm text-gray-500">
-                {statsError || "No aggregated data yet for this range."}
+                {statsError?.message || "No aggregated data yet for this range."}
               </div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">

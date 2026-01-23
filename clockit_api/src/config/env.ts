@@ -8,8 +8,8 @@ dotenv.config();
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  PORT: z.string().default('3001').transform(Number),
-  API_BASE_URL: z.string().url().default('http://localhost:3001'),
+  PORT: z.string().default('4001').transform(Number),
+  API_BASE_URL: z.string().url().default('http://localhost:4001'),
   FIREBASE_SERVICE_ACCOUNT_B64: z.string().min(1),
   ALLOWED_ORIGINS: z.string().default('http://localhost:3000'),
   RATE_LIMIT_WINDOW_MS: z.string().default('900000').transform(Number),
@@ -34,14 +34,23 @@ const parseEnv = () => {
 };
 
 export const env = parseEnv();
-
+const getAllowedOrigins = () => {
+  const allowed_origins_b64 = process.env.ALLOWED_ORIGINS;
+  if (!allowed_origins_b64) {return ['http://localhost:3000'];}
+  try {
+    const decoded = Buffer.from(allowed_origins_b64, 'base64').toString('utf-8');
+    return decoded.split(',').map(origin => origin.trim());
+  } catch {
+    return ['http://localhost:3000'];
+  }
+};
 export const config = {
   isDevelopment: env.NODE_ENV === 'development',
   isProduction: env.NODE_ENV === 'production',
   isTest: env.NODE_ENV === 'test',
   port: env.PORT,
   apiBaseUrl: env.API_BASE_URL,
-  allowedOrigins: env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim()),
+  allowedOrigins: getAllowedOrigins(),
   rateLimit: {
     windowMs: env.RATE_LIMIT_WINDOW_MS,
     maxRequests: env.RATE_LIMIT_MAX_REQUESTS,

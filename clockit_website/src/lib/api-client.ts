@@ -3,6 +3,9 @@ import { auth } from './firebase';
 import z from 'zod';
 import type { FeatureGroup, CreateFeatureGroupRequest, UpdateFeatureGroupRequest } from '@/types/feature-group.types';
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+const SERVER_UNAVAILABLE_CODE = 'SERVER_UNAVAILABLE';
+export const SERVER_UNAVAILABLE_MESSAGE =
+  "Sorry, our servers can't be reached right now. It might be down for maintenance. Please try again later.";
 
 export interface ApiResponse<T = unknown> {
   success: boolean;
@@ -74,17 +77,40 @@ class ApiClient {
       headers['Idempotency-Key'] = this.generateIdempotencyKey();
     }
 
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      ...options,
-      headers,
-    });
+    let response: Response;
+    try {
+      response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        ...options,
+        headers,
+      });
+    } catch (error) {
+      throw new ApiError(0, SERVER_UNAVAILABLE_CODE, SERVER_UNAVAILABLE_MESSAGE, { cause: error });
+    }
 
     // Handle 204 No Content responses (e.g., DELETE operations)
     if (response.status === 204) {
       return undefined as T;
     }
 
-    const data: ApiResponse<T> = await response.json();
+    const contentType = response.headers.get('content-type') || '';
+    let data: ApiResponse<T> | null = null;
+    if (contentType.includes('application/json')) {
+      try {
+        data = await response.json();
+      } catch (error) {
+        throw new ApiError(response.status, SERVER_UNAVAILABLE_CODE, SERVER_UNAVAILABLE_MESSAGE, { cause: error });
+      }
+    } else {
+      const text = await response.text();
+      throw new ApiError(response.status, SERVER_UNAVAILABLE_CODE, SERVER_UNAVAILABLE_MESSAGE, {
+        bodyPreview: text.slice(0, 200),
+      });
+    }
+
+    // Ensure data is not null (should not happen given the logic above, but TypeScript needs the check)
+    if (!data) {
+      throw new ApiError(response.status, SERVER_UNAVAILABLE_CODE, 'Invalid response: no data received');
+    }
 
     if (!response.ok || !data.success) {
       throw new ApiError(
@@ -124,6 +150,10 @@ class ApiClient {
 }
 
 export const apiClient = new ApiClient();
+
+export function isServerUnavailableError(error: unknown): error is ApiError {
+  return error instanceof ApiError && error.code === SERVER_UNAVAILABLE_CODE;
+}
 
 export interface TokenListItem {
   id: string;

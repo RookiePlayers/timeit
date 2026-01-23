@@ -7,10 +7,11 @@ import { auth } from "@/lib/firebase";
 import { useSnackbar } from "notistack";
 import { useRouter } from "next/navigation";
 import NavBar from "@/components/NavBar";
-import { UploadResponse, uploadsApi } from "@/lib/api-client";
+import { isServerUnavailableError, UploadResponse, uploadsApi } from "@/lib/api-client";
 import { UploadRow } from "@/types";
 import useFeature from "@/hooks/useFeature";
 import { buildNavLinks, isFeatureEnabledForNav } from "@/utils/navigation";
+import ServerUnavailable from "@/components/ServerUnavailable";
 
 
 export default function RecentActivityPage() {
@@ -123,6 +124,10 @@ export default function RecentActivityPage() {
         </div>
       </div>
     );
+  }
+
+  if (uploadsError && isServerUnavailableError(uploadsError)) {
+    return <ServerUnavailable />;
   }
 
   const rows: UploadRow[] = uploads.map((upload) => {

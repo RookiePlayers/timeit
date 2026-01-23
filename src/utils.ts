@@ -1,5 +1,6 @@
 import { secondsToHMS } from './core/util';
 import type { Session } from './core/types';
+import { configTargetForKey } from './core/config-target';
 import * as os from 'os';
 import { execSync } from 'child_process';
 
@@ -284,7 +285,7 @@ export class Utils {
 
     const folderUri = selection[0];
     const cfg = this.vscode.workspace.getConfiguration();
-    await cfg.update('clockit.csv.outputDirectory', folderUri.fsPath, this.vscode.ConfigurationTarget.Workspace);
+    await cfg.update('clockit.csv.outputDirectory', folderUri.fsPath, configTargetForKey('clockit.csv.outputDirectory'));
 
     const ensure = cfg.get<boolean>('clockit.csv.ensureDirectory') ?? true;
     if (ensure) {
