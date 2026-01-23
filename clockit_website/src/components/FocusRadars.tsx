@@ -79,13 +79,13 @@ export default function FocusRadars({ initialRange = "week" }: Props) {
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <RadarPanel
           title="Language focus"
-          emptyLabel={statsError?.message || "No language time recorded for this range yet."}
+          emptyLabel="No language time recorded for this range yet."
           data={radarData.map((d) => ({ label: d.language, hours: d.hours }))}
           color="#6366f1"
         />
         <RadarPanel
           title="Workspace focus"
-          emptyLabel={statsError?.message || "No workspace time recorded for this range yet."}
+          emptyLabel="No workspace time recorded for this range yet."
           data={workspaceRadarData.map((d) => ({ label: d.workspace, hours: d.hours }))}
           color="#0ea5e9"
         />

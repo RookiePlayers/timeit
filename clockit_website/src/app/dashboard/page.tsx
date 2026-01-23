@@ -25,6 +25,13 @@ const rangeLabels: Record<Range, string> = {
   all: "All time",
 };
 
+// Helper to convert Firestore timestamp to number
+function toTimestamp(value: number | { _seconds: number; _nanoseconds: number } | null | undefined): number | null {
+  if (!value) return null;
+  if (typeof value === 'number') return value;
+  return value._seconds * 1000;
+}
+
 export default function DashboardPage() {
   const [user, loadingUser, authError] = useAuthState(auth);
   const { isFeatureEnabled } = useFeature();
@@ -34,8 +41,8 @@ export default function DashboardPage() {
   const [isLoadingStats, setIsLoadingStats] = useState(true);
   const [statsError, setStatsError] = useState<Error | null>(null);
   const router = useRouter();
-  const [lastRefresh, setLastRefresh] = useState<number | null | { _seconds: number; _nanoseconds: number }>(null);
-  const [lastUpdated, setLastUpdated] = useState<number | null | { _seconds: number; _nanoseconds: number }>(null);
+  const [lastRefresh, setLastRefresh] = useState<number | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<number | null>(null);
   const [statsRefreshKey, setStatsRefreshKey] = useState(0);
   const COOLDOWN_MS = 60 * 60 * 1000; // 1 hour
 
@@ -69,12 +76,13 @@ export default function DashboardPage() {
         }
 
         setAggregates(data.aggregates || null);
-        const ts = data.lastRefreshRequested;
-        if (typeof ts === "number" && Number.isFinite(ts)) {
-          setLastRefresh(ts);
-        }
-        const aggregateTs = data.lastAggregatedAt;
-        const updatedTs = data.updatedAt;
+
+        // Convert timestamps from Firestore format to milliseconds
+        const ts = toTimestamp(data.lastRefreshRequested);
+        setLastRefresh(ts);
+
+        const aggregateTs = toTimestamp(data.lastAggregatedAt);
+        const updatedTs = toTimestamp(data.updatedAt);
         const chosen = aggregateTs || updatedTs || ts || null;
         setLastUpdated(chosen);
       } catch (err) {
@@ -201,7 +209,7 @@ console.log('Rendering dashboard for user:', lastUpdated);
             <h1 className="text-3xl font-bold text-[var(--text)]">Your productivity at a glance</h1>
             <p className="text-sm text-[var(--muted)] mt-1">
               Data shown for {rangeLabels[range].toLowerCase()}
-              {lastUpdated ? ` — last updated ${new Date(lastUpdated?._seconds ? lastUpdated._seconds * 1000 : 0).toLocaleString()}` : ""}.
+              {lastUpdated ? ` — last updated ${new Date(lastUpdated).toLocaleString()}` : ""}.
             </p>
           </div>
           <div className="flex flex-wrap gap-2 items-center">

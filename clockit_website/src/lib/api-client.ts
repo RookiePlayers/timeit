@@ -107,6 +107,11 @@ class ApiClient {
       });
     }
 
+    // Ensure data is not null (should not happen given the logic above, but TypeScript needs the check)
+    if (!data) {
+      throw new ApiError(response.status, SERVER_UNAVAILABLE_CODE, 'Invalid response: no data received');
+    }
+
     if (!response.ok || !data.success) {
       throw new ApiError(
         response.status,
