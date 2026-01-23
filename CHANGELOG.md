@@ -1,3 +1,10 @@
+# [1.12.0-dev.3](https://github.com/RookiePlayers/clockit/compare/v1.12.0-dev.2...v1.12.0-dev.3) (2026-01-23)
+
+
+### Bug Fixes
+
+* Enhance Redis connection handling with timeout and availability checks ([231d33c](https://github.com/RookiePlayers/clockit/commit/231d33c9c67e14a7dc1cc5f8db6733ca8dcb5862))
+
 # [1.12.0-dev.2](https://github.com/RookiePlayers/clockit/compare/v1.12.0-dev.1...v1.12.0-dev.2) (2026-01-23)
 
 
