@@ -1,3 +1,32 @@
+# [1.12.0-dev.1](https://github.com/RookiePlayers/clockit/compare/v1.11.7...v1.12.0-dev.1) (2026-01-23)
+
+
+### Bug Fixes
+
+* Add _API_BASE_URL substitution for Cloud Run deployments in API and Socket workflows ([6b22ce9](https://github.com/RookiePlayers/clockit/commit/6b22ce9dc8ad0f68511ed2feb1759d82f16b6c88))
+* Add default substitutions for rate limiting and logging in Cloud Build configurations ([cf8a02f](https://github.com/RookiePlayers/clockit/commit/cf8a02f2ee923662911d388c493a6ab76c23207b))
+* Enhance Cloud Build substitutions for API and Socket deployments to include optional secrets ([59b5594](https://github.com/RookiePlayers/clockit/commit/59b55947b50cd8b4e3d203fc69d2d406095c80f2))
+* Enhance timestamp handling in DashboardPage and improve error handling in ApiClient ([a77db4a](https://github.com/RookiePlayers/clockit/commit/a77db4ad6731a773cfe1e3cc75aa075d07c63d83))
+* Improve error handling in useFetchAggregates and update backup directory resolution logic ([d8786d7](https://github.com/RookiePlayers/clockit/commit/d8786d7e89732d83f50bc1b8b4e238dbc1b05722))
+* Properly remove API_BASE_URL from socket workflow to fix deployment ([ce199fc](https://github.com/RookiePlayers/clockit/commit/ce199fc0c87cfccfae9eb57b2265f41703e2610e))
+* Remove _API_BASE_URL substitution from Cloud Run deployment configuration ([336ad99](https://github.com/RookiePlayers/clockit/commit/336ad99dfc49cb420fdc24f7c1c817f899c510be))
+* Remove API_BASE_URL from socket deployment to prevent parsing errors ([32a05dd](https://github.com/RookiePlayers/clockit/commit/32a05dd26f947b6496c12a4d901645318eee8123))
+* Remove default substitutions for _API_BASE_URL in Cloud Build configurations ([6dd82be](https://github.com/RookiePlayers/clockit/commit/6dd82bed8ce31a9110496cebfd624adb35cc4605))
+* Simplify substitutions in Cloud Build configurations for API and Socket deployments ([302881a](https://github.com/RookiePlayers/clockit/commit/302881a72d3f77c8f2b1ac0f3a5175d7f7056391))
+* Update allowed origins substitution in deployment workflows ([0831108](https://github.com/RookiePlayers/clockit/commit/0831108610e56b989a5731736891b4ca6377e3d1))
+* Update backup directory handling and configuration target logic ([bb6d73d](https://github.com/RookiePlayers/clockit/commit/bb6d73ddf03b8fdb2492658ab2760b2d60acc0bd))
+* Update substitutions in Cloud Build configurations for API and Socket deployments ([613a4a4](https://github.com/RookiePlayers/clockit/commit/613a4a471a2b92a7aa8e0c3de43817da8c40ee39))
+
+
+### Features
+
+* Update environment configuration, enhance stats service, and improve error handling ([37ce6d6](https://github.com/RookiePlayers/clockit/commit/37ce6d677d325133213f2d5a5eb8f97118f9048c))
+
+
+### Performance Improvements
+
+* Add caching to high-traffic routes and optimize Cloud Run configuration ([12e5bad](https://github.com/RookiePlayers/clockit/commit/12e5badb7762107085c886988795daab2bf24ac6)), closes [hi#traffic](https://github.com/hi/issues/traffic)
+
 ## [1.11.7](https://github.com/RookiePlayers/clockit/compare/v1.11.6...v1.11.7) (2026-01-02)
 
 
