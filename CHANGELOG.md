@@ -1,3 +1,19 @@
+# [1.12.0](https://github.com/RookiePlayers/clockit/compare/v1.11.14...v1.12.0) (2026-01-23)
+
+
+### Bug Fixes
+
+* Enhance Redis connection handling with timeout and availability checks ([231d33c](https://github.com/RookiePlayers/clockit/commit/231d33c9c67e14a7dc1cc5f8db6733ca8dcb5862))
+* Enhance timestamp handling in DashboardPage and improve error handling in ApiClient ([a77db4a](https://github.com/RookiePlayers/clockit/commit/a77db4ad6731a773cfe1e3cc75aa075d07c63d83))
+* Improve error handling in useFetchAggregates and update backup directory resolution logic ([d8786d7](https://github.com/RookiePlayers/clockit/commit/d8786d7e89732d83f50bc1b8b4e238dbc1b05722))
+* Refactor allowedOrigins handling to improve base64 decoding and fallback logic ([9f10d15](https://github.com/RookiePlayers/clockit/commit/9f10d15e47532579a26b0bfe67ea634883cfb98d))
+* Update backup directory handling and configuration target logic ([bb6d73d](https://github.com/RookiePlayers/clockit/commit/bb6d73ddf03b8fdb2492658ab2760b2d60acc0bd))
+
+
+### Features
+
+* Update environment configuration, enhance stats service, and improve error handling ([37ce6d6](https://github.com/RookiePlayers/clockit/commit/37ce6d677d325133213f2d5a5eb8f97118f9048c))
+
 # [1.12.0-dev.2](https://github.com/RookiePlayers/clockit/compare/v1.12.0-dev.1...v1.12.0-dev.2) (2026-01-23)
 
 
